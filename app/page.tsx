@@ -1,6 +1,8 @@
 "use client";
 import connection from "@/app/supabase/supabase";
 import {useEffect, useState} from "react";
+import Navbar from "@/app/components/Navbar/Navbar";
+import Hero from "@/app/components/Landing/Hero";
 
 export default function Home() {
     const [userData, setUserData] = useState<any>(null)
@@ -34,6 +36,8 @@ export default function Home() {
 
     return (
         <main>
+            <Navbar/>
+            <Hero/>
             <nav className={"mt-4 gap-4 flex justify-center"}>
 
                 <button onClick={() => window.location.href = '/login'}
