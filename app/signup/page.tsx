@@ -1,4 +1,5 @@
 import Signup from "@/app/components/Authentification/Signup";
+import Logo from "@/app/components/Logo/Logo";
 
 export default function Home() {
     return (
@@ -11,14 +12,9 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-col items-center w-full max-w-3xl p-8 mx-auto lg:px-12 lg:w-3/5 color = red">
-                        <div className="mt-10 mb-6 flex items-center justify-center w-16 h-16 bg-[#5752DA] rounded-full">
-                            <a href="/">
-                                {/*SVG in shape of letter H*/}
-                                <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-white"
-                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
-                                          d="M4 6h16M4 12h16m-7 6h7"/>
-                                </svg>
+                        <div className="flex justify-center mx-auto mb-10">
+                            <a className={"h-24 w-24"} href="/">
+                                <Logo/>
                             </a>
                         </div>
                         <div className="w-full">
