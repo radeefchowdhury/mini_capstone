@@ -29,7 +29,7 @@ function Navbar(props: NavbarProps) {
     const loginButtonClasses = classNames({
         'text-black hover:bg-gray-900/10': isDynamic && !isScrolled,
         'text-white hover:bg-zinc-800': !(isDynamic && !isScrolled),
-        'align-middle outline select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg text-gray-900 active:bg-gray-900/20': true
+        'align-middle outline outline-2 outline-zinc-800 select-none font-sans font-bold text-center uppercase transition-all disabled:opacity-50 disabled:shadow-none disabled:pointer-events-none text-xs py-3 px-6 rounded-lg text-gray-900 active:bg-gray-900/20': true
     });
 
     useEffect(() => {
@@ -51,7 +51,6 @@ function Navbar(props: NavbarProps) {
             if(scrollTop <= 0) setIsScrolled(true);
             else if(scrollTop > 0 && isScrolled) setIsScrolled(scrollTop <= 0);
         }
-
         window.addEventListener('scroll', handleScroll);
         const fetchData = async () => {
             try {
@@ -62,7 +61,6 @@ function Navbar(props: NavbarProps) {
             }
         }
         fetchData().catch(console.error)
-
         return () => {
             window.removeEventListener('scroll', handleScroll);
         }

@@ -1,4 +1,6 @@
-import type { Config } from "tailwindcss";
+import { Config } from "tailwindcss";
+
+const plugin = require("tailwindcss/plugin");
 
 const config: Config = {
   content: [
@@ -15,5 +17,19 @@ const config: Config = {
       },
     },
   },
+  plugins: [
+    plugin(({ addVariant, e }: any) => {
+      // Add a custom variant, "sidebar-expanded"
+      addVariant("sidebar-expanded", ({ modifySelectors, separator }: any) => {
+        modifySelectors(
+            ({ className }: any) =>
+                // Modify selectors to apply the custom variant
+                `.sidebar-expanded .${e(
+                    `sidebar-expanded${separator}${className}`
+                )}`
+        );
+      });
+    }),
+  ],
 };
 export default config;

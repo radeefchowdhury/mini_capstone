@@ -27,8 +27,14 @@ const Login = () => {
         await supabase.auth.signInWithPassword({
             email,
             password,
+        }).then((response) => {
+            if(response.error) {
+                console.log(response.error?.message)
+                return;
+            } else {
+                router.push('/')
+            }
         })
-        router.push('/');
     }
 
     return (

@@ -45,32 +45,46 @@ const SignUp = () => {
             setPasswordMatchError(true);
             return;
         }
-
         setPasswordMatchError(false);
-
 
         const { data, error} = await supabase.auth.signUp({
             email,
-            password,
-            options: {
-                data: {
-                    first_name: firstName,
-                    last_name: lastName,
-                    phone: phone,
-                    user_type: userType,
-                },
-            },
+            password
         });
+
+        // Get user id from supabase
+        const id = data?.user?.id;
 
         if (error) {
             console.error('Error signing up:', error.message);
             return;
         }
 
-        console.log('User signed up:', data.user);
-        window.location.href = '/login';
-        console.log('Submitted:', { firstName, lastName, phone, email, password, userType });
+        const user_profile_data = {
+            id,
+            first_name: firstName,
+            last_name: lastName,
+            phone_number: phone,
+            contact_email: email,
+            role: userType.toUpperCase()
+        }
+        await createUserProfile(user_profile_data)
+
     };
+
+    const createUserProfile = async (data: any) => {
+        supabase
+            .from('user_profile')
+            .insert([data])
+            .then(response => {
+                if(response.error) console.log('Error creating user profile:', response.error)
+                else{
+                    console.log('User profile created:', response)
+                    window.location.href = '/login';
+                }
+            })
+    }
+
 
     return (
         <div>
