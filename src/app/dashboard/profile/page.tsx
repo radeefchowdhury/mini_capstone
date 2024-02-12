@@ -19,22 +19,35 @@ function Page() {
     const windowClassName = "p-6 bg-white shadow-sm rounded-md";
     const [profileOptions, setProfileOptions] = React.useState<ProfileOptions>({} as ProfileOptions);
 
+
     const submitProfileOptions = async () => {
         await supabase
             .from('user_profile')
             .upsert([profileOptions])
     }
 
+
     const handleProfileChange = (event: any) => {
-        const field = event.target.id
-        const value = event.target.value
-        setProfileOptions(prevState => {
-            return {
+        const field = event.target.id;
+
+        if (event.target.type === 'file') {
+            const file = event.target.files ? event.target.files[0] : null;
+            if (!file) return
+
+            const fileURL = URL.createObjectURL(file);
+            setProfileOptions(prevState => ({
+                ...prevState,
+                [field]: fileURL
+            }))
+        } else {
+            const value = event.target.value;
+            setProfileOptions(prevState => ({
                 ...prevState,
                 [field]: value
-            }
-        })
+            }))
+        }
     }
+
 
     React.useEffect(() => {
         const fetchData = async () => {
@@ -122,6 +135,7 @@ function Page() {
                                 alt={"profile picture"}
                                 width={120}
                                 height={120}
+                                style={{ objectFit: 'cover' }}
                                 priority={true}
                             />
                             <span className={"mt-5 font-semibold"}>{profileOptions.first_name} {profileOptions.last_name}</span>
@@ -142,9 +156,21 @@ function Page() {
                         </div>
                     </div>
 
+
                     <div className={`${windowClassName} text-slate-600 font-bold text-lg`}>
-                        Select profile photo
+                        <div className="mb-2">
+                            <p className="text-gray-600 font-semibold text-lg">
+                                Select profile photo
+                            </p>
+                        </div>
+                        <input className={`text-slate-600 font-bold text-lg`}
+                            onChange={handleProfileChange}
+                            type="file" id={"profile_picture"} name={"profile_picture"}
+                            />
+
                     </div>
+
+
                 </div>
             </div>
         </main>
