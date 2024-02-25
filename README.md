@@ -18,5 +18,6 @@
 1. Jinqiu Yang (instructor) (jinqiu.yang@concordia.ca)
 2. Lin Ling (TA) (jane.ling912@gmail.com)
 
-## Sprint 2
+## Sprint 2 Feb. 8 – Feb. 28
+
 ![image](https://github.com/radeefchowdhury/mini_capstone/assets/53652464/dd479d12-d985-4e60-b50e-cafb50d5460a)
