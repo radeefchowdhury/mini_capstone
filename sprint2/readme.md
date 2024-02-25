@@ -1,3 +1,4 @@
+## next meeting: tuesday 27th: 7pm (tentative)
 ### Documentation deliverables
 1. product vision statement
 2. requirements and user stories backlog
