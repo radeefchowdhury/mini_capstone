@@ -21,3 +21,25 @@
 ## Sprint 2 Feb. 8 – Feb. 28
 
 ![image](https://github.com/radeefchowdhury/mini_capstone/assets/53652464/dd479d12-d985-4e60-b50e-cafb50d5460a)
+
+## How to run
+
+Make sure you have node installed. We highly recommend using nvm to install node versions. [nvm-Windows](https://github.com/coreybutler/nvm-windows/releases)
+
+nvm instructions:
+```
+ nvm install latest
+ nvm use node
+```
+
+Check if node is installed:
+```
+ node -v
+```
+
+Once node is installed:
+```
+ cd /src
+ npm run install
+ npm run dev
+```
