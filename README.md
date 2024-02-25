@@ -1,4 +1,6 @@
 # HomeHaven: Property management app
+## team news
+- most docs are now fully transcribed to wiki -e
 ## Team 19
 1. Elion Abdyli 40132982
 2. Victor Vasconcelos 40177135
