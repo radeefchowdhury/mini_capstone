@@ -1,4 +1,5 @@
 ## next meeting: tuesday 27th: 7pm (tentative)
+### https://app.eraser.io/workspace/AfOsE14dVWhJJGEpH5FS?origin=share&elements=ZNUZpPJm6LYBGHwHfClajA
 ### Documentation deliverables
 1. product vision statement
 2. requirements and user stories backlog
