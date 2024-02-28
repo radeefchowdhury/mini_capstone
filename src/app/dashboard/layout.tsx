@@ -11,6 +11,7 @@ export default function RootLayout({children}: {
 }) {
     // State to track whether the sidebar is open or closed
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [marginExpanded, setMarginExpanded] = useState(false);
 
     // State to track if the viewport is in mobile mode
     const [isMobile, setIsMobile] = useState(false);
@@ -27,9 +28,15 @@ export default function RootLayout({children}: {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    useEffect(() => {
+        if(!isMobile) {
+            setMarginExpanded(!marginExpanded)
+        }
+    }, [sidebarOpen]);
+
     return (
         <>
-            <div className="flex h-screen bg-gray-200">
+            <div className={`flex min-h-screen h-full bg-gray-200`}>
                 <div>
                     {/* Render the Sidenav component */}
                     <SideNav
@@ -41,12 +48,13 @@ export default function RootLayout({children}: {
                     {/* Render the Header component if in mobile mode */}
                     {isMobile && (
                         <MobileHeader
+                            sidebarOpen={sidebarOpen}
                             setSidebarOpen={setSidebarOpen}
                             className="sticky top-0 bg-white border-b border-slate-200 z-30"
                         />
                     )}
                     {/* Render the main content */}
-                    <main>{children}</main>
+                    <main className={`${marginExpanded ? 'sm:ml-[255px]' : 'sm:ml-[79px]'} `}>{children}</main>
                 </div>
             </div>
         </>

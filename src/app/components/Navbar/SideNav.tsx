@@ -36,7 +36,7 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
             <div
                 id="sidebar"
                 ref={sidebar}
-                className={`fixed flex flex-col z-40 left-0 top-0 sm:static sm:left-auto sm:top-auto drop-shadow-sm h-screen overflow-hidden no-scrollbar sm:w-64  w-72 bg-white sm:sidebar-expanded:w-20 shrink-0 border-r border-gray-200 sm:translate-x-0 p-4 transition-all duration-200 ${
+                className={`fixed flex flex-col z-40 left-0 top-0 sm:left-auto sm:top-auto drop-shadow-sm h-screen overflow-hidden no-scrollbar sm:w-64  w-72 bg-white sm:sidebar-expanded:w-20 shrink-0 border-r border-gray-200 sm:translate-x-0 p-4 transition-all duration-200 ${
                     sidebarOpen ? "translate-x-0" : "-translate-x-72"
                 }`}
             >
@@ -108,9 +108,9 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                                     <span
                                       className={`${
                                           sidebarExpanded
-                                              ? "sm:hidden opacity-0 ml-0"
-                                              : "opacity-100 ml-3 block"
-                                      }ml-3 whitespace-nowrap `}
+                                              ? "sm:hidden ml-0"
+                                              : "ml-3 block"
+                                      } ml-3 whitespace-nowrap `}
                                     >
                                     Edit Profile
                                     </span>
@@ -124,7 +124,10 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                 <div className="pt-3 sm:inline-flex  mt-auto ">
                     <div className="flex-1" />
                     <div className="px-3 py-2 justify-end">
-                        <button onClick={() => setSidebarExpanded(!sidebarExpanded)}>
+                        <button onClick={() => {
+                            setSidebarExpanded(!sidebarExpanded);
+                            setSidebarOpen(!sidebarOpen)
+                        }}>
                             <span className="sr-only">Expand / collapse sidebar</span>
                             <svg
                                 className={`w-6 h-6 hidden sm:block fill-current ${
