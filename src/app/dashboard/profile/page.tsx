@@ -31,9 +31,33 @@ function Page() {
         await supabase
             .from('user_profile')
             .upsert([profileOptions])
+    }
 
-        // Refresh the page
-        // window.location.reload()
+    const uploadProfilePicture = async () => {
+        if(!profilePictureFile) return
+        await supabase
+            .storage
+            .from('profile_picture_bucket')
+            .upload(`${profileOptions.id}_avatar.png`, profilePictureFile, {
+                cacheControl: '3600',
+                upsert: true
+            })
+            .then(getProfilePictureURL)
+            .catch(console.error)
+    }
+
+    const getProfilePictureURL = async () => {
+        supabase
+            .storage
+            .from('profile_picture_bucket')
+            .createSignedUrl(`${profileOptions.id}_avatar.png`, 60)
+            .then(res => {
+                setProfileOptions(prevState => ({
+                ...prevState,
+                profile_picture: res.data?.signedUrl
+                }))})
+            .then(submitProfileOptions)
+            .catch(console.error)
     }
 
     const handleToggleVisibility = () => {
@@ -45,26 +69,13 @@ function Page() {
     };
 
     const submitProfilePicture = async (event: any) => {
-        if (!profilePictureFile){
+        event.preventDefault()
+        if(!profilePictureFile) {
             console.log('No file selected')
             return
         }
-        await supabase.storage
-            .from('profile_picture_bucket')
-            .upload(`${profileOptions.id}_avatar.png`, profilePictureFile)
-
-        const { data, error } = await supabase.storage
-            .from('profile_picture_bucket')
-            .createSignedUrl(`${profileOptions.id}_avatar.png`, 60);
-
-        setProfileOptions(prevState => ({
-            ...prevState,
-            profile_picture: data?.signedUrl
-        }))
-
-        await submitProfileOptions()
+        await uploadProfilePicture()
     }
-
 
     const handleProfileChange = async (event: any) => {
         const field = event.target.id;
