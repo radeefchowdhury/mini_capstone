@@ -8,6 +8,7 @@ const Login = () => {
 
     const supabase = connection
     const router = useRouter()
+    const [error, setError] = useState('')
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -20,21 +21,21 @@ const Login = () => {
         setPassword(event.target.value)
     };
 
-
-    const handleSubmit =  async (event:any) => {
-        event.preventDefault();
-
+    const signInWithPassword = async (email: string, password: string) => {
         await supabase.auth.signInWithPassword({
             email,
             password,
-        }).then((response) => {
-            if(response.error) {
-                console.log(response.error?.message)
-                return;
-            } else {
-                router.push('/')
-            }
         })
+            .then((res) => {
+                if (res.error) setError(res.error.message)
+                else router.push('/')
+            })
+            .catch(console.error)
+    }
+
+    const handleSubmit =  async (event:any) => {
+        event.preventDefault();
+        await signInWithPassword(email, password)
     }
 
     return (
@@ -62,6 +63,12 @@ const Login = () => {
                     Sign in
                 </button>
             </div>
+
+
+            <div className="mt-4">
+                <p className="text-sm text-red-500">{error}</p>
+            </div>
+
         </form>
     )
 }

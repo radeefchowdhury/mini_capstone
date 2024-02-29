@@ -5,6 +5,7 @@ import connection from '../../supabase/supabase';
 const SignUp = () => {
     const supabase = connection;
 
+    const [error, setError] = useState('');
     const [userType, setUserType] = useState('renter');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
@@ -38,15 +39,7 @@ const SignUp = () => {
         setPassword(event.target.value);
     };
 
-    const handleSubmit = async (event: any) => {
-        event.preventDefault();
-
-        if (password !== confirmPassword) {
-            setPasswordMatchError(true);
-            return;
-        }
-        setPasswordMatchError(false);
-
+    const signUpWithEmail = async (email: string, password: string) => {
         const { data, error} = await supabase.auth.signUp({
             email,
             password
@@ -57,9 +50,9 @@ const SignUp = () => {
 
         if (error) {
             console.error('Error signing up:', error.message);
+            setError(error.message);
             return;
         }
-
         const user_profile_data = {
             id,
             first_name: firstName,
@@ -68,8 +61,19 @@ const SignUp = () => {
             contact_email: email,
             role: userType.toUpperCase()
         }
-        await createUserProfile(user_profile_data)
 
+        await createUserProfile(user_profile_data)
+    }
+
+    const handleSubmit = async (event: any) => {
+        event.preventDefault();
+
+        if (password !== confirmPassword) {
+            setPasswordMatchError(true);
+            return;
+        }
+        setPasswordMatchError(false);
+        await signUpWithEmail(email, password);
     };
 
     const createUserProfile = async (data: any) => {
@@ -84,7 +88,6 @@ const SignUp = () => {
                 }
             })
     }
-
 
     return (
         <div>
@@ -164,6 +167,9 @@ const SignUp = () => {
                         <p className="text-red-500 text-xs mt-1">Passwords do not match. Please try again.</p>
                     )}
                 </div>
+                <div className={`${error ? 'block' : 'hidden'}`}>
+                    <p className="text-sm text-red-500">{error}</p>
+                </div>
                 <p className="md:col-span-2 text-sm text-center text-gray-400">Already have an account? <a
                     href="login"
                     className="text-blue-500 focus:outline-none focus:underline hover:underline">
@@ -182,6 +188,7 @@ const SignUp = () => {
                     </svg>
                 </button>
             </form>
+
 
         </div>
     );

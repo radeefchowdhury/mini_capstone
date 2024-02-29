@@ -11,7 +11,7 @@ export default function Home() {
                          style={{backgroundImage: 'url("https://www.stayhomesearch.com/wp-content/uploads/2018/11/YUL-condos-rental-9.jpg")'}}>
                     </div>
 
-                    <div className="mt-10 flex flex-col items-center w-full max-w-3xl p-8 mx-auto lg:px-12 lg:w-3/5 color = red">
+                    <div className="mt-10 flex flex-col items-center w-full max-w-3xl p-8 mx-auto lg:px-12 lg:w-3/5">
                         <div className="flex justify-center mx-auto mb-10">
                             <a className={"h-24 w-24"} href="/">
                                 <Logo/>

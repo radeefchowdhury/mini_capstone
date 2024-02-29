@@ -4,37 +4,20 @@ import React from 'react';
 import Image from 'next/image'
 import connection from "@/app/supabase/supabase";
 import {EyeIcon, PencilIcon} from "@heroicons/react/16/solid";
+import {UserProfileType} from "@/app/constants/types";
 
-interface ProfileOptions {
-    id?: string;
-    first_name?: string;
-    last_name?: string;
-    contact_email?: string;
-    phone_number?: string;
-    profile_picture?: string;
-    role?: string;
-    registration_key?: string;
-}
+
 function Page() {
 
     const supabase = connection;
-    const windowClassName = "p-6 bg-white shadow-sm rounded-md";
-    const [profileOptions, setProfileOptions] = React.useState<ProfileOptions>({} as ProfileOptions);
+    const windowClassName = "w-full p-6 bg-white shadow-sm rounded-md";
+    const [userProfile, setUserProfile] = React.useState<UserProfileType>({} as UserProfileType);
 
     const [keyVisible, setKeyVisible] = React.useState<boolean>(false);
     const [editable, setEditable] = React.useState(false);
+    const [uploading, setUploading] = React.useState(false);
 
     const [profilePictureFile, setProfilePictureFile] = React.useState<File | null>(null);
-
-
-    const submitProfileOptions = async () => {
-        await supabase
-            .from('user_profile')
-            .upsert([profileOptions])
-
-        // Refresh the page
-        // window.location.reload()
-    }
 
     const handleToggleVisibility = () => {
         setKeyVisible(!keyVisible);
@@ -44,66 +27,93 @@ function Page() {
         setEditable(!editable);
     };
 
-    const submitProfilePicture = async (event: any) => {
-        if (!profilePictureFile){
-            console.log('No file selected')
-            return
-        }
-        await supabase.storage
-            .from('profile_picture_bucket')
-            .upload(`${profileOptions.id}_avatar.png`, profilePictureFile)
-
-        const { data, error } = await supabase.storage
-            .from('profile_picture_bucket')
-            .createSignedUrl(`${profileOptions.id}_avatar.png`, 60);
-
-        setProfileOptions(prevState => ({
-            ...prevState,
-            profile_picture: data?.signedUrl
-        }))
-
-        await submitProfileOptions()
+    const submitUserProfile = async () => {
+        await supabase
+            .from('user_profile')
+            .upsert([userProfile])
     }
 
+    const getUserProfile = async ()  => {
+        const {data, error} = await supabase
+            .from('user_profile')
+            .select('*')
+        return {data, error}
+    }
+
+    const uploadProfilePicture = async () => {
+        if(!profilePictureFile) return
+        await supabase
+            .storage
+            .from('profile_picture_bucket')
+            .upload(`${userProfile.id}_avatar.png`, profilePictureFile, {
+                cacheControl: '3600',
+                upsert: true
+            })
+            .catch(console.error)
+    }
+
+    const getProfilePictureURL = async () => {
+        const {data} =  supabase
+            .storage
+            .from('profile_picture_bucket')
+            .getPublicUrl(`${userProfile.id}_avatar.png`)
+        setUserProfile(prevState => ({
+            ...prevState,
+            profile_picture: data.publicUrl
+        }))
+    }
+
+    const submitProfilePicture = async (event: any) => {
+        event.preventDefault()
+        setUploading(true)
+        uploadProfilePicture().then(getProfilePictureURL).catch(console.error);
+    }
 
     const handleProfileChange = async (event: any) => {
         const field = event.target.id;
-        console.log('here')
         if (event.target.type === 'file') {
             const file = event.target.files ? event.target.files[0] : null;
             if (!file) return
             let fileURL = URL.createObjectURL(file);
             setProfilePictureFile(file);
-            setProfileOptions(prevState => ({
+            setUserProfile(prevState => ({
                 ...prevState,
                 [field]: fileURL
             }))
         } else {
             const value = event.target.value;
-            setProfileOptions(prevState => ({
+            setUserProfile(prevState => ({
                 ...prevState,
                 [field]: value
             }))
         }
     }
 
+    // Submit profile picture if it's not a blob
+    React.useEffect(() => {
+        if(uploading && profilePictureFile && !userProfile.profile_picture?.includes('blob')){
+            submitUserProfile().catch(console.error)
+            setUploading(false)
+            window.location.reload()
+        }
+    }, [userProfile.profile_picture])
 
+    // Fetch user profile data
     React.useEffect(() => {
         const fetchData = async () => {
             const userSession = await supabase.auth.getSession()
-            if (!userSession) window.location.href = '/login'
-            const {data, error} = await supabase
-                .from('user_profile')
-                .select('*')
+            if (!userSession.data.session) window.location.href = '/login'
 
+            const {data, error} = await getUserProfile()
             if (error) {
                 console.log('Error fetching user data: ', error)
-                // redirect to login page
                 window.location.href = '/login'
                 return
-            } else {
-                setProfileOptions(data[0])
+            } if (data == null) {
+                console.log('No data found')
+                return
             }
+            setUserProfile(data[0])
         }
         fetchData().catch(console.error)
     }, []);
@@ -113,7 +123,7 @@ function Page() {
     }
 
     return (
-        <main className="p-8 mt-10">
+        <main className="p-8 mt-2 sm:mt-8">
             <div className="main-content flex flex-col items-center lg:items-start lg:flex-row gap-6 w-full">
                 <div className="w-full flex flex-col gap-6">
                     <div className={`${windowClassName}`}>
@@ -127,14 +137,14 @@ function Page() {
                                     <input
                                         onChange={handleProfileChange}
                                         type="text" id="first_name" name="first_name"
-                                        placeholder={profileOptions.first_name}
+                                        placeholder={userProfile.first_name}
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <label htmlFor="last_name" className="">Last Name</label>
                                     <input
                                         onChange={handleProfileChange}
-                                        placeholder={profileOptions.last_name} type="text" id="last_name" name="last_name"
+                                        placeholder={userProfile.last_name} type="text" id="last_name" name="last_name"
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>
                             </div>
@@ -142,21 +152,21 @@ function Page() {
                                 <label htmlFor="contact_email" className="">Email</label>
                                 <input
                                     onChange={handleProfileChange}
-                                    type="email" id="contact_email" name="email" placeholder={profileOptions.contact_email}
+                                    type="email" id="contact_email" name="email" placeholder={userProfile.contact_email}
                                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="phone_number" className="">Phone</label>
                                 <input
                                     onChange={handleProfileChange}
-                                    type="tel" id="phone_number" name="phone" placeholder={profileOptions.phone_number}
+                                    type="tel" id="phone_number" name="phone" placeholder={userProfile.phone_number}
                                     pattern="\d*" className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                             </div>
                         </div>
                         <div className={"bg-slate-100 -mx-6 -mb-6 rounded-b-md"}>
                             <div className={"px-6 py-4"}>
                                 <button
-                                    onClick={submitProfileOptions}
+                                    onClick={submitUserProfile}
                                     className="px-4 py-4 h-7 bg-indigo-500 rounded-lg hover:bg-indigo-600 text-md justify-center items-center gap-2.5 inline-flex">
                                     <span className="font-semibold text-white">Save</span>
                                 </button>
@@ -176,14 +186,14 @@ function Page() {
                                             <input
                                                 id={"registration_key"}
                                                 type="text"
-                                                value={profileOptions.registration_key}
+                                                value={userProfile.registration_key}
                                                 onChange={handleProfileChange}
                                                 className="border rounded-md px-2 py-1 w-full"
                                             />
                                         </form>
                                     ) : (
                                         <div className="flex items-center">
-                                            <span className="mr-2">{keyVisible ? profileOptions.registration_key : '***'}</span>
+                                            <span className="mr-2">{keyVisible ? userProfile.registration_key : '***'}</span>
                                             <button
                                                 onClick={handleToggleVisibility}
                                                 className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -206,38 +216,23 @@ function Page() {
                     </div>
                 </div>
 
-                <div className="w-full flex flex-col sm:max-w-fit gap-6">
+                <div className="w-full flex flex-col lg:max-w-fit gap-6">
                     <div className={`${windowClassName} text-slate-600 font-bold text-lg`}>
                         <div className={`text-slate-700 font-bold text-lg`}>
                             How others see you
                         </div>
-                        <div className="mt-16 mb-4 flex flex-col items-center gap-1">
+                        <div className="mt-10 mb-4 flex flex-col items-center gap-1">
                             <div className={"image-container w-[120px] h-[120px]"}>
-                                <Image
-                                    className={"rounded-full w-full h-full object-cover"}
-                                    src={profileOptions.profile_picture || "/default_profile_picture.png"}
+                                <img
+                                    className={"w-full h-full rounded-full object-cover"}
+                                    src={userProfile.profile_picture || "/default_profile_picture.png"}
                                     alt={"profile picture"}
-                                    width={120}
-                                    height={120}
-                                    style={{objectFit: 'cover'}}
-                                    priority={true}
                                 />
                             </div>
-                            <span className={"mt-5 font-semibold"}>{profileOptions.first_name} {profileOptions.last_name}</span>
-                            <span className={"mt-2 font-medium"}>({profileOptions.role})</span>
-                            <span className={"text-md font-normal"}>{profileOptions.contact_email}</span>
-                            <span className={"text-md font-normal"}>{profileOptions.phone_number}</span>
-                            <div className={"mt-3 flex flex-row gap-2"}>
-                                {/*Connect button */}
-                                <button
-                                    className="mt-2 px-3 h-7 bg-slate-700 rounded-lg hover:bg-slate-800 text-sm justify-center items-center gap-2.5 inline-flex">
-                                    <span className="font-semibold text-white">Connect</span>
-                                </button>
-                                {/*Send message button */}
-                                <button className="mt-2 px-3 h-7 bg-orange-400 rounded-lg hover:bg-orange-500 text-sm justify-center items-center gap-2.5 inline-flex">
-                                    <span className="font-semibold text-slate-900 flex-nowrap">Send Message</span>
-                                </button>
-                            </div>
+                            <span className={"mt-5 font-semibold"}>{userProfile.first_name} {userProfile.last_name}</span>
+                            <span className={"mt-2 font-medium"}>({userProfile.role?.charAt(0).toUpperCase() || ''}{userProfile.role?.slice(1).toLowerCase()})</span>
+                            <span className={"text-md font-normal"}>{userProfile.contact_email}</span>
+                            <span className={"text-md font-normal mb-[3px]"}>{userProfile.phone_number}</span>
                         </div>
                     </div>
 
