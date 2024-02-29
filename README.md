@@ -50,17 +50,19 @@ Once node is installed:
 
 ### 1. Open a codespace
 
-Click on **Create a codespace on master** :
+ - Click on **Create a codespace on master** :
 
 ![image](https://github.com/radeefchowdhury/mini_capstone/assets/53652464/31aa84e7-28b2-42db-878b-2a4d8136b739)
 
 ### 2. Run commands
-Paste this line directly into bash and click "Open in Browser"
+ - Paste this line directly into bash and click "Open in Browser"
+
 ```bash
 pwd;nvm -v;npm -v;node -v;cd src;nvm use node;npm install;npm run dev;
 
 ```
-Should look like this
+ - The first four commands simply confirm the dependencies, which need not be installed manually because the codespace is preconfigured for node.
+Should look like this:
 ![image](https://github.com/radeefchowdhury/mini_capstone/assets/53652464/5e72d805-1d00-4b27-8c75-b499607d698d)
 
 
