@@ -42,7 +42,7 @@ Check if node is installed:
 Once node is installed:
 ```
  cd /src
- npm run install
+ npm install
  npm run dev
 ```
 
