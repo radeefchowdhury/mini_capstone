@@ -2,8 +2,8 @@
 
 // Import necessary components and hooks
 import { useEffect, useState } from "react";
-import SideNav from "@/app/components/Navbar/SideNav";
-import MobileHeader from "@/app/components/Navbar/MobileHeader";
+import SideNav from "@/app/components/Navbars/SideNav";
+import MobileHeader from "@/app/components/Navbars/MobileHeader";
 
 // Define the RootLayout component
 export default function RootLayout({children}: {
@@ -11,7 +11,7 @@ export default function RootLayout({children}: {
 }) {
     // State to track whether the sidebar is open or closed
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [marginExpanded, setMarginExpanded] = useState(false);
+    const [marginExpanded, setMarginExpanded] = useState(true);
 
     // State to track if the viewport is in mobile mode
     const [isMobile, setIsMobile] = useState(false);
@@ -33,6 +33,10 @@ export default function RootLayout({children}: {
             setMarginExpanded(!marginExpanded)
         }
     }, [sidebarOpen]);
+
+    useEffect(() => {
+        setMarginExpanded(true)
+    }, []);
 
     return (
         <>

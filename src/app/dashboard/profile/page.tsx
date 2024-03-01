@@ -1,10 +1,15 @@
 "use client"
 
-import React from 'react';
-import Image from 'next/image'
-import connection from "@/app/supabase/supabase";
+import React, {useEffect} from 'react';
+import connection from "@/app/api/supabase/supabase";
 import {EyeIcon, PencilIcon} from "@heroicons/react/16/solid";
 import {UserProfileType} from "@/app/constants/types";
+import {
+    getProfilePictureURL,
+    getUserProfile, getUserSession,
+    submitUserProfile,
+    uploadProfilePicture
+} from "@/app/api/userprofile/UserProfileAPI";
 
 
 function Page() {
@@ -17,6 +22,9 @@ function Page() {
     const [editable, setEditable] = React.useState(false);
     const [uploading, setUploading] = React.useState(false);
 
+    const [profileError, setProfileError] = React.useState<string>('');
+    const [fileError, setFileError] = React.useState<string>('');
+
     const [profilePictureFile, setProfilePictureFile] = React.useState<File | null>(null);
 
     const handleToggleVisibility = () => {
@@ -27,94 +35,121 @@ function Page() {
         setEditable(!editable);
     };
 
-    const submitUserProfile = async () => {
-        await supabase
-            .from('user_profile')
-            .upsert([userProfile])
+    const saveUserProfile = () => {
+        if (!checkProfile()) return
+        submitUserProfile(userProfile).catch(console.error)
     }
 
-    const getUserProfile = async ()  => {
-        const {data, error} = await supabase
-            .from('user_profile')
-            .select('*')
-        return {data, error}
-    }
-
-    const uploadProfilePicture = async () => {
-        if(!profilePictureFile) return
-        await supabase
-            .storage
-            .from('profile_picture_bucket')
-            .upload(`${userProfile.id}_avatar.png`, profilePictureFile, {
-                cacheControl: '3600',
-                upsert: true
-            })
-            .catch(console.error)
-    }
-
-    const getProfilePictureURL = async () => {
-        const {data} =  supabase
-            .storage
-            .from('profile_picture_bucket')
-            .getPublicUrl(`${userProfile.id}_avatar.png`)
+    const updateProfile = (field: keyof UserProfileType, value: string) => {
         setUserProfile(prevState => ({
             ...prevState,
-            profile_picture: data.publicUrl
+            [field]: value
         }))
+    }
+
+    const fetchData = async () => {
+        const userSession = await getUserSession()
+        if (!userSession) window.location.href = '/login'
+
+        const {data, error} = await getUserProfile()
+        if (error || !data){
+            console.error(error?.message || 'Error fetching user profile')
+            return
+        }
+        if(data[0].profile_picture) data[0].profile_picture += `?${Date.now()}`
+        setUserProfile(data[0])
     }
 
     const submitProfilePicture = async (event: any) => {
         event.preventDefault()
+        if(!profilePictureFile) return
         setUploading(true)
-        uploadProfilePicture().then(getProfilePictureURL).catch(console.error);
+        uploadProfilePicture(
+            profilePictureFile,
+            `${userProfile.id}_avatar.png`
+        )
+            .then(async () => {
+                const imageURL = await getProfilePictureURL(`${userProfile.id}_avatar.png`)
+                updateProfile('profile_picture', imageURL)
+            })
+            .catch(console.error);
     }
 
-    const handleProfileChange = async (event: any) => {
-        const field = event.target.id;
-        if (event.target.type === 'file') {
-            const file = event.target.files ? event.target.files[0] : null;
-            if (!file) return
-            let fileURL = URL.createObjectURL(file);
-            setProfilePictureFile(file);
-            setUserProfile(prevState => ({
-                ...prevState,
-                [field]: fileURL
-            }))
-        } else {
-            const value = event.target.value;
-            setUserProfile(prevState => ({
-                ...prevState,
-                [field]: value
-            }))
+    const handleProfileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const field = event.target.id as keyof UserProfileType;
+        const prevValue = userProfile[field as keyof UserProfileType] || '';
+        const isValid = event.target.validity.valid;
+        const value = event.target.value;
+
+        if (!isValid && value !== '' && field !== 'contact_email') {
+            event.target.value = prevValue.toString();
+            return
         }
+        updateProfile(field, value)
     }
 
-    // Submit profile picture if it's not a blob
+    const checkProfile = () => {
+        // Check first name and last name are not empty and is at least 3 characters long
+        if (!userProfile.first_name || userProfile.first_name.length < 3) {
+            setProfileError('First name must be at least 3 characters long');
+            return false
+        }
+        if (!userProfile.last_name || userProfile.last_name.length < 3) {
+            setProfileError('Last name must be at least 3 characters long');
+            return false
+        }
+        // Check email pattern using regex
+        const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+        if (!userProfile.contact_email?.match(emailPattern)) {
+            setProfileError('Invalid email');
+            return false
+        }
+        // Check phone number pattern using regex
+        const phonePattern = /^\d{10}$/;
+        if (!userProfile.phone_number?.toString().match(phonePattern)) {
+            setProfileError('Invalid phone number, must be 10 digits');
+            return false
+        }
+        return true
+    }
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files ? event.target.files[0] : null;
+        if (!file) return
+        const fileURL = URL.createObjectURL(file);
+        // Check file type is image
+        if (!file.type.includes('image')) {
+            setFileError('Invalid file type');
+            return
+        }
+        // Check file size <= 2MB
+        if (file.size > 2 * 1024 * 1024) {
+            setFileError('File size must be less than 2MB');
+            return
+        }
+        setFileError('');
+        setProfilePictureFile(file);
+        updateProfile('profile_picture', fileURL)
+    }
+
+
     React.useEffect(() => {
+        if(!userProfile.profile_picture == undefined || !userProfile.profile_picture) return
+        // If the profile picture is a blob, it means the userProfile has not been submitted yet
+        // So we wait for the profile picture to be uploaded before submitting the userProfile
         if(uploading && profilePictureFile && !userProfile.profile_picture?.includes('blob')){
-            submitUserProfile().catch(console.error)
+            submitUserProfile(userProfile).catch(console.error)
             setUploading(false)
-            window.location.reload()
+            return
+        }
+        // Cache busting
+        if(!userProfile.profile_picture?.includes('local') && !userProfile.profile_picture?.includes('?')){
+            updateProfile('profile_picture', userProfile.profile_picture + `?${Date.now()}`)
         }
     }, [userProfile.profile_picture])
 
     // Fetch user profile data
     React.useEffect(() => {
-        const fetchData = async () => {
-            const userSession = await supabase.auth.getSession()
-            if (!userSession.data.session) window.location.href = '/login'
-
-            const {data, error} = await getUserProfile()
-            if (error) {
-                console.log('Error fetching user data: ', error)
-                window.location.href = '/login'
-                return
-            } if (data == null) {
-                console.log('No data found')
-                return
-            }
-            setUserProfile(data[0])
-        }
         fetchData().catch(console.error)
     }, []);
 
@@ -130,13 +165,14 @@ function Page() {
                         <div className={`w-full text-slate-600 font-bold text-lg`}>
                             Profile Information
                         </div>
-                        <div className="mt-6 mb-10 text-slate-500 font-medium text-[16px] flex flex-col gap-6">
+                        <div className="mt-6 mb-7 text-slate-500 font-medium text-[16px] flex flex-col gap-6">
                             <div className="flex flex-col sm:flex-row gap-6 [&>*]:w-full">
                                 <div className="flex flex-col gap-1">
                                     <label htmlFor="first_name" className="">First Name</label>
                                     <input
                                         onChange={handleProfileChange}
                                         type="text" id="first_name" name="first_name"
+                                        pattern={"[A-Za-z]*"}
                                         placeholder={userProfile.first_name}
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>
@@ -144,7 +180,9 @@ function Page() {
                                     <label htmlFor="last_name" className="">Last Name</label>
                                     <input
                                         onChange={handleProfileChange}
-                                        placeholder={userProfile.last_name} type="text" id="last_name" name="last_name"
+                                        pattern={"[A-Za-z]*"}
+                                        type="text" id="last_name" name="last_name"
+                                        placeholder={userProfile.last_name}
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>
                             </div>
@@ -152,21 +190,23 @@ function Page() {
                                 <label htmlFor="contact_email" className="">Email</label>
                                 <input
                                     onChange={handleProfileChange}
-                                    type="email" id="contact_email" name="email" placeholder={userProfile.contact_email}
+                                    type="email" id="contact_email" name="email"
+                                    placeholder={userProfile.contact_email}
                                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                             </div>
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="phone_number" className="">Phone</label>
                                 <input
                                     onChange={handleProfileChange}
-                                    type="tel" id="phone_number" name="phone" placeholder={userProfile.phone_number}
+                                    type="tel" id="phone_number" name="phone" placeholder={userProfile.phone_number?.toString()}
                                     pattern="\d*" className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                             </div>
                         </div>
+                        <div className="my-4 profile_error text-red-500 text-md font-semibold">{profileError}</div>
                         <div className={"bg-slate-100 -mx-6 -mb-6 rounded-b-md"}>
                             <div className={"px-6 py-4"}>
                                 <button
-                                    onClick={submitUserProfile}
+                                    onClick={saveUserProfile}
                                     className="px-4 py-4 h-7 bg-indigo-500 rounded-lg hover:bg-indigo-600 text-md justify-center items-center gap-2.5 inline-flex">
                                     <span className="font-semibold text-white">Save</span>
                                 </button>
@@ -243,11 +283,12 @@ function Page() {
                             </p>
                         </div>
                         <input
-                            className={`mt-6 relative m-0 block w-full min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-sm font-normal text-neutral-700 transition duration-200 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none `}
-                            onChange={handleProfileChange}
+                            className={`mt-6 mb-7 relative m-0 block w-full min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-sm font-normal text-neutral-700 transition duration-200 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none `}
+                            onChange={handleFileChange}
                             type="file" id={"profile_picture"} name={"profile_picture"}
                         />
-                        <div className={"bg-slate-100 -mx-6 -mb-6 mt-7 rounded-b-md"}>
+                        <div className="-mt-3 mb-4 text-red-500 text-[16px] font-semibold">{fileError}</div>
+                        <div className={"bg-slate-100 -mx-6 -mb-6 mt-2 rounded-b-md"}>
                             <div className={"px-6 py-4"}>
                                 <button
                                     onClick={submitProfilePicture}

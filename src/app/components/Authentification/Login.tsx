@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import connection from "../../supabase/supabase"
+import connection from "@/app/api/supabase/supabase";
 import {useRouter} from "next/navigation";
 
 const Login = () => {
