@@ -2,8 +2,6 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
 
 export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
     // Define state for sidebar expansion
@@ -43,35 +41,30 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                 {/* Sidebar header */}
                 <div className="flex justify-between pr-3 sm:px-2">
                     {/* Sidebar Logo */}
-                    <Link href="/">
-            <span
-                className={`${
-                    sidebarExpanded ? "sm:hidden" : "block"
-                }  welcome-step text-2xl font-medium tracking-tighter text-black focus:outline-none focus:ring whitespace-nowrap cursor-pointer`}
-            >
-              <Image
-                  className="mt-2 mb-8 w-40 object-contain"
-                  src="/home_haven.png"
-                  height={32}
-                  width={300}
-                  alt="logo"
-                  priority={true}
-              />
-            </span>
-                    </Link>
+                    <a href="/">
+                        <span
+                            className={`${
+                                sidebarExpanded ? "sm:hidden" : "block"
+                            }  welcome-step text-2xl font-medium tracking-tighter text-black focus:outline-none focus:ring whitespace-nowrap cursor-pointer`}
+                        >
+                          <img
+                              className="h-[32px] w-40 mt-2 mb-8 object-contain"
+                              src="/home_haven.png"
+                              alt="big logo"
+                          />
+                        </span>
+                    </a>
 
                     {/* Sidebar Icon (Collapsed) */}
-                    <Link href="/">
-                        <Image
+                    <a href="/">
+                        <img
                             className={`${
                                 !sidebarExpanded ? "sm:hidden" : "block"
-                            } mt-1 mb-8 h-8 w-8 `}
+                            } mt-2 mb-8 h-8 w-8 `}
                             src="/hh-bw.png"
-                            height={100}
-                            width={100}
                             alt="logo"
                         />
-                    </Link>
+                    </a>
                 </div>
 
                 {/* Links */}
@@ -85,7 +78,7 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                     </p>
                     <ul className="space-y-2">
                         <li>
-                            <Link
+                            <a
                                 onClick={() => setSidebarOpen(false)}
                                 href="/dashboard/profile"
                                 className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
@@ -115,7 +108,7 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                                     Edit Profile
                                     </span>
                                 </span>
-                            </Link>
+                            </a>
                         </li>
                     </ul>
                 </div>

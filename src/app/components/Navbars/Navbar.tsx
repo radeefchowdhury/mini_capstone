@@ -1,7 +1,7 @@
 "use client"
 import React, {useEffect, useRef, useState} from 'react';
 import Logo from "@/app/components/Logo/Logo";
-import supabase from "@/app/supabase/supabase";
+import supabase from "@/app/api/supabase/supabase";
 import classNames from "classnames";
 
 interface NavbarProps {
