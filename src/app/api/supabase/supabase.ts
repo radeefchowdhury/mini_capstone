@@ -6,3 +6,4 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""
 const connection = createClient(supabaseUrl, supabaseKey)
 
 export default connection
+
