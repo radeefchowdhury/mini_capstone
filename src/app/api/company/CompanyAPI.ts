@@ -3,7 +3,6 @@ import {CompanyType} from "@/app/constants/types";
 
 const supabase = connection;
 export const submitCompanyProfile = async (companyProfile: CompanyType) => {
-    console.log(companyProfile)
     supabase
         .from('Company')
         .upsert([companyProfile])

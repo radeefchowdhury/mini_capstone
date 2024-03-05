@@ -4,7 +4,7 @@ interface DashboardPanelProps {
     title: string;
     closable?: boolean;
     children?: React.ReactNode;
-    onClick: () => void;
+    onClick?: () => void;
     buttonTitle?: string
 }
 

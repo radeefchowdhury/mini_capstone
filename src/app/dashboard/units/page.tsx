@@ -1,9 +1,8 @@
 "use client"
 import DashboardPanel from "@/app/components/Dashboard/DashboardPanel";
 import React, {useEffect} from "react";
-import CondoTable from "@/app/dashboard/units/CondoTable";
-import {getCondoList} from "@/app/api/condo/CondoAPI";
-import {CondoUnitType} from "@/app/constants/types";
+import {getCondoListFromPublicUser} from "@/app/api/property/PropertyAPI";
+import {CondoUnitType, UserType} from "@/app/constants/types";
 import DashboardTable from "@/app/components/Dashboard/DashboardTable";
 
 const condoTableHeaders = [
@@ -17,7 +16,7 @@ const condoTableHeaders = [
 ]
 function Page() {
 
-    const [userType, setUserType] = React.useState<'RENTER' | 'OWNER' | 'COMPANY'>();
+    const [userType, setUserType] = React.useState<UserType>();
     const [condoData, setCondoData] = React.useState<CondoUnitType[]>([]);
     const [filteredCondoData, setFilteredCondoData] = React.useState<any[]>([]);
     const [userId, setUserId] = React.useState<string>();
@@ -27,7 +26,7 @@ function Page() {
     }
 
     const fetchCondoData = async () => {
-        const {data, error} = await getCondoList(userId);
+        const {data, error} = await getCondoListFromPublicUser(userId);
         if(error){
             console.log(error)
             return
@@ -36,7 +35,7 @@ function Page() {
     }
 
     useEffect(() => {
-        setUserType(localStorage.getItem('user_role') as 'RENTER' | 'OWNER' | 'COMPANY');
+        setUserType(localStorage.getItem('user_role') as unknown as UserType);
         setUserId(localStorage.getItem('user_id') as string);
     }, []);
 
@@ -68,7 +67,7 @@ function Page() {
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
             <div className={"min-w-0 max-w-fit"}>
                 <DashboardPanel
-                    title={'My Rented Units'}
+                    title={`${ 'My Condo Units'}`}
                     buttonTitle={'Register New Unit'}
                     children={<DashboardTable items={filteredCondoData} headers={condoTableHeaders} />}
                     onClick={registerNewUnit}/>

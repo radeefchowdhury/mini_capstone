@@ -18,6 +18,10 @@ export interface PropertyType {
     id: number;
     name: string;
     address: string;
+    description: string;
+    unit_count: number;
+    parking_count: number;
+    locker_count: number;
     company_id: string;
 }
 

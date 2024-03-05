@@ -3,6 +3,7 @@
 import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
 import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
+import {getCompanyProfile} from "@/app/api/company/CompanyAPI";
 
 const Login = () => {
 
@@ -32,12 +33,23 @@ const Login = () => {
                         if (res.data) {
                             // Add a user_role in local storage
                             const user_role = res.data[0]?.role
-                            if (user_role) localStorage.setItem('user_role', user_role.toUpperCase())
-                            else localStorage.setItem('user_role', 'COMPANY')
-                            localStorage.setItem('user_id', res.data[0]?.id)
+                            if (user_role){
+                                localStorage.setItem('user_role', user_role.toUpperCase())
+                                localStorage.setItem('user_id', res.data[0]?.id)
+
+                            } else {
+                                localStorage.setItem('user_role', 'COMPANY')
+                                getCompanyProfile().then((res) => {
+                                    console.log(res)
+                                    if (res.data) {
+                                        localStorage.setItem('user_id', res.data[0].id)
+                                    }
+                                })
+                            }
                             window.location.href = '/'
                         }
                     })
+
                 }
             })
             .catch(console.error)
