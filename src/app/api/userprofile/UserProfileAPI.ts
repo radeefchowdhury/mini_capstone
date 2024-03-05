@@ -1,7 +1,7 @@
 import connection from "@/app/api/supabase/supabase";
 import {UserProfileType} from "@/app/constants/types";
-const supabase = connection;
 
+const supabase = connection;
 
 export const getUserSession = async () => {
     const res = await supabase.auth.getSession()
@@ -9,14 +9,15 @@ export const getUserSession = async () => {
 }
 export const submitUserProfile = async (userProfile:UserProfileType) => {
     supabase
-        .from('user_profile')
+        .from('UserProfile')
         .upsert([userProfile])
+        .then(console.log)
     window.location.reload()
 }
 
 export const getUserProfile = async ()  => {
     const {data, error} = await supabase
-        .from('user_profile')
+        .from('UserProfile')
         .select('*')
     return {data, error}
 }

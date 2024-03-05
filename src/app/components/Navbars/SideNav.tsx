@@ -2,8 +2,18 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
+import {BuildingOffice2Icon, BuildingOfficeIcon} from "@heroicons/react/24/outline";
+import {UserType} from "@/app/constants/types";
 
-export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
+interface SideNavProps {
+    sidebarOpen: any;
+    setSidebarOpen: any;
+    userType?: UserType;
+}
+
+export default function SideNav(props: SideNavProps) {
+    // Destructure props
+    const { sidebarOpen, setSidebarOpen, userType} = props;
     // Define state for sidebar expansion
     const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(false);
 
@@ -77,20 +87,22 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                         Actions
                     </p>
                     <ul className="space-y-2">
+                        {userType &&
                         <li>
                             <a
                                 onClick={() => setSidebarOpen(false)}
                                 href="/dashboard/profile"
                                 className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
                             >
-                                <span className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                <span
+                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
                                     <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.5}
-                                      stroke="currentColor"
-                                      className="w-6 h-6"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="w-6 h-6"
                                     >
                                     <path
                                         strokeLinecap="round"
@@ -99,23 +111,67 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                                     />
                                     </svg>
                                     <span
-                                      className={`${
-                                          sidebarExpanded
-                                              ? "sm:hidden ml-0"
-                                              : "ml-3 block"
-                                      } ml-3 whitespace-nowrap `}
+                                        className={`${
+                                            sidebarExpanded
+                                                ? "sm:hidden ml-0"
+                                                : "ml-3 block"
+                                        } ml-3 whitespace-nowrap `}
                                     >
                                     Edit Profile
                                     </span>
                                 </span>
                             </a>
-                        </li>
+                        </li>}
+                        {userType === UserType.COMPANY &&
+                            <li>
+                            <a
+                                onClick={() => setSidebarOpen(false)}
+                                href="/dashboard/properties"
+                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
+                            >
+                                <span
+                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                    <BuildingOffice2Icon className={"w-6"}/>
+                                    <span
+                                        className={`${
+                                            sidebarExpanded
+                                                ? "sm:hidden ml-0"
+                                                : "ml-3 block"
+                                        } ml-3 whitespace-nowrap `}
+                                    >
+                                    View Properties
+                                    </span>
+                                </span>
+                            </a>
+                        </li>}
+                        {(userType === UserType.RENTER || userType === UserType.OWNER || userType === UserType.COMPANY) &&
+                        <li>
+                            <a
+                                onClick={() => setSidebarOpen(false)}
+                                href="/dashboard/units"
+                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
+                            >
+                            <span
+                                className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                <BuildingOfficeIcon className={"w-6"}/>
+                                <span
+                                    className={`${
+                                        sidebarExpanded
+                                            ? "sm:hidden ml-0"
+                                            : "ml-3 block"
+                                    } ml-3 whitespace-nowrap `}
+                                >
+                                View Units
+                                </span>
+                            </span>
+                            </a>
+                        </li>}
                     </ul>
                 </div>
 
                 {/* Expand / collapse button */}
                 <div className="pt-3 sm:inline-flex  mt-auto ">
-                    <div className="flex-1" />
+                    <div className="flex-1"/>
                     <div className="px-3 py-2 justify-end">
                         <button onClick={() => {
                             setSidebarExpanded(!sidebarExpanded);

@@ -2,12 +2,11 @@
 
 import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
-
+import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
 
 const Login = () => {
 
     const supabase = connection
-
     const [error, setError] = useState('')
 
     const [email, setEmail] = useState('')
@@ -28,7 +27,18 @@ const Login = () => {
         })
             .then((res) => {
                 if (res.error) setError(res.error.message)
-                else window.location.href = '/'
+                else{
+                    getUserProfile().then((res) => {
+                        if (res.data) {
+                            // Add a user_role in local storage
+                            const user_role = res.data[0]?.role
+                            if (user_role) localStorage.setItem('user_role', user_role.toUpperCase())
+                            else localStorage.setItem('user_role', 'COMPANY')
+                            localStorage.setItem('user_id', res.data[0]?.id)
+                            window.location.href = '/'
+                        }
+                    })
+                }
             })
             .catch(console.error)
     }
