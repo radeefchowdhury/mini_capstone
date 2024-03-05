@@ -1,6 +1,6 @@
 "use client"
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import {CompanyType, UserProfileType} from "@/app/constants/types";
 import {
     getProfilePictureURL,
@@ -28,7 +28,7 @@ function Page() {
         setProfileError('');
         if (userType === 'COMPANY' && checkCompanyProfileValidity())
             submitCompanyProfile(companyProfile).catch(console.error)
-        if (userType === 'RENTER' || userType === 'OWNER' && checkUserProfileValidity())
+        if ((userType === 'RENTER' || userType === 'OWNER') && checkUserProfileValidity())
             submitUserProfile(userProfile).catch(console.error)
     }
 
@@ -195,19 +195,13 @@ function Page() {
 
     // Fetch user profile data
     React.useEffect(() => {
-        if (typeof window === 'undefined') return;
-        setUserType(localStorage.getItem('user_role') as 'RENTER' | 'OWNER' | 'COMPANY' | null)
+        setUserType(localStorage.getItem('user_role') as 'RENTER' | 'OWNER' | 'COMPANY')
     }, []);
 
     React.useEffect(() => {
-        if (typeof window === 'undefined') return;
         if (userType === 'COMPANY') fetchCompanyData().catch(console.error)
         else if (userType === 'RENTER' || userType === 'OWNER') fetchUserData().catch(console.error)
     }, [userType]);
-
-    function handleSubmit() {
-        console.log('submitted');
-    }
 
     return (
         <main className="">
@@ -219,7 +213,7 @@ function Page() {
                         </div>
                         <div className="mt-6 mb-7 text-slate-500 font-medium text-[16px] flex flex-col gap-6">
                             <div className="flex flex-col sm:flex-row gap-6 [&>*]:w-full">
-                                {userType === "RENTER" || userType === "OWNER" &&
+                                {(userType === "RENTER" || userType === "OWNER") &&
                                 <div className="flex flex-col gap-1">
                                     <label htmlFor="first_name" className="">First Name</label>
                                     <input
@@ -229,7 +223,7 @@ function Page() {
                                         placeholder={userProfile.first_name}
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>}
-                                {userType === "RENTER" || userType === "OWNER" &&
+                                {(userType === "RENTER" || userType === "OWNER") &&
                                     <div className="flex flex-col gap-1">
                                     <label htmlFor="last_name" className="">Last Name</label>
                                     <input
@@ -250,7 +244,7 @@ function Page() {
                                             className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                     </div>}
                             </div>
-                            {userType === "RENTER" || userType === "OWNER" &&
+                            {(userType === "RENTER" || userType === "OWNER") &&
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="contact_email" className="">Email</label>
                                 <input
@@ -268,7 +262,7 @@ function Page() {
                                     placeholder={companyProfile.email}
                                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                             </div>}
-                            {userType === "RENTER" || userType === "OWNER" &&
+                            {(userType === "RENTER" || userType === "OWNER") &&
                             <div className="flex flex-col gap-1">
                                 <label htmlFor="phone_number" className="">Phone</label>
                                 <input
@@ -298,7 +292,8 @@ function Page() {
                     </div>
                 </div>
 
-                {userType === "RENTER" || userType === "OWNER" && <div className="w-full flex flex-col lg:max-w-fit gap-6">
+                {(userType === "RENTER" || userType === "OWNER") &&
+                    <div className="w-full flex flex-col lg:max-w-fit gap-6">
                     <div className={`${windowClassName} text-slate-600 font-bold text-lg`}>
                         <div className={`text-slate-700 font-bold text-lg`}>
                             How others see you

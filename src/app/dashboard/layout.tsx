@@ -4,12 +4,14 @@
 import { useEffect, useState } from "react";
 import SideNav from "@/app/components/Navbars/SideNav";
 import MobileHeader from "@/app/components/Navbars/MobileHeader";
+import {UserType} from "@/app/constants/types";
 
 // Define the RootLayout component
 export default function RootLayout({children}: {
     children: React.ReactNode;
 }) {
     // State to track whether the sidebar is open or closed
+    const [userType, setUserType] = useState<UserType>();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [marginExpanded, setMarginExpanded] = useState(true);
 
@@ -35,6 +37,7 @@ export default function RootLayout({children}: {
     }, [sidebarOpen]);
 
     useEffect(() => {
+        setUserType(localStorage.getItem('user_role') as unknown as UserType);
         setMarginExpanded(true)
     }, []);
 
@@ -44,11 +47,12 @@ export default function RootLayout({children}: {
                 <div>
                     {/* Render the Sidenav component */}
                     <SideNav
+                        userType={userType}
                         sidebarOpen={sidebarOpen}
                         setSidebarOpen={setSidebarOpen}
                     />
                 </div>
-                <div className="relative flex flex-col flex-1 lg:overflow-y-auto lg:overflow-x-hidden">
+                <div className="relative flex flex-col flex-1 overflow-x-hidden">
                     {/* Render the Header component if in mobile mode */}
                     {isMobile && (
                         <MobileHeader

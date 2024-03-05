@@ -7,19 +7,15 @@
         @apply rounded-lg bg-gray-900;
     }
     th{
-        @apply text-center whitespace-nowrap font-bold py-4 px-10 text-white font-medium;
+        @apply text-center whitespace-nowrap py-4 px-9 text-white font-medium;
     }
     tr{
-        @apply border-t;
+        @apply border-t py-3 px-10 h-12;
     }
     td{
-        @apply text-center whitespace-nowrap py-3 px-10;
+        @apply text-center whitespace-nowrap ;
     }
     tbody{
         @apply bg-white;
     }
-}
-
-table{
-    outline: 1px solid #e3e5ea;
 }
