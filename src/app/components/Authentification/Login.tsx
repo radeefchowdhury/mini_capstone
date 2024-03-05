@@ -2,12 +2,12 @@
 
 import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
-import {useRouter} from "next/navigation";
+
 
 const Login = () => {
 
     const supabase = connection
-    const router = useRouter()
+
     const [error, setError] = useState('')
 
     const [email, setEmail] = useState('')
@@ -28,7 +28,7 @@ const Login = () => {
         })
             .then((res) => {
                 if (res.error) setError(res.error.message)
-                else router.push('/')
+                else window.location.href = '/'
             })
             .catch(console.error)
     }
