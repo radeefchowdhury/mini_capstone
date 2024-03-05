@@ -27,6 +27,12 @@ export default function Home() {
                                 your profile.
                             </p>
                             <Signup/>
+                            <p className="md:col-span-2 text-sm text-center py-4 text-gray-400">Already have an account? <a
+                                href="login"
+                                className="text-blue-500 focus:outline-none focus:underline hover:underline">
+                                Log in
+                            </a>.
+                            </p>
 
 
                         </div>

@@ -2,13 +2,11 @@
 
 import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
-import {useRouter} from "next/navigation";
 import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
 
 const Login = () => {
 
     const supabase = connection
-    const router = useRouter()
     const [error, setError] = useState('')
 
     const [email, setEmail] = useState('')
@@ -37,7 +35,7 @@ const Login = () => {
                             if (user_role) localStorage.setItem('user_role', user_role.toUpperCase())
                             else localStorage.setItem('user_role', 'COMPANY')
                             localStorage.setItem('user_id', res.data[0]?.id)
-                            router.push('/')
+                            window.location.href = '/'
                         }
                     })
                 }

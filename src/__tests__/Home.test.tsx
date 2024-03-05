@@ -1,3 +1,8 @@
+import { render, act, screen } from '@testing-library/react';
+import Home from '../app/page'; // Adjust the import path as necessary
+import connection from "../app/api/supabase/supabase";
+import userEvent from '@testing-library/user-event';
+
 // First, mock the necessary parts of Supabase
 jest.mock("../app/api/supabase/supabase", () => ({
     auth: {
@@ -8,32 +13,63 @@ jest.mock("../app/api/supabase/supabase", () => ({
     }
 }));
 
-// Mock window.location.href
-Object.defineProperty(window, 'location', {
-    value: {
-        href: jest.fn()
-    },
-    writable: true
-});
-
-// Import after mocks
-import { render, screen, fireEvent } from '@testing-library/react';
-import Home from '../app/page'; // Adjust the import path as necessary
-import connection from "../app/api/supabase/supabase";
-
 describe('Home Component', () => {
-    it('should display the user email when logged in', async () => {
-        render(<Home />);
-        const userEmail = await screen.findByText(/Logged in as: test@example.com/i);
-        expect(userEmail).toBeInTheDocument();
+
+    beforeEach(() => {
+        // Reset mocks before each test
+        connection.auth.signOut.mockClear();
+        connection.auth.getSession.mockClear();
     });
 
-    it('should handle sign-out and redirect to home page', async () => {
-        render(<Home />);
-        const signOutButton = screen.getByText(/Sign out/i);
-        fireEvent.click(signOutButton);
-
-        expect(connection.auth.signOut).toHaveBeenCalled();
-        expect(window.location.href).toBe('/');
+    it('should render without crashing', async () => {
+        await act(async () => {
+            render(<Home />);
+        });
+        // If the component renders without throwing, the test will pass.
+        // You can add more assertions here if needed.
     });
+
+    it('renders sign-in button when user is not signed in', async () => {
+        // Mock getSession to simulate no user session
+        connection.auth.getSession.mockResolvedValueOnce({ data: { session: null } });
+
+        render(<Home />);
+        const signInButton = await screen.findByRole('button', { name: /log in/i });
+        expect(signInButton).toBeInTheDocument();
+    });
+
+    it('renders sign-up button when user is not signed in', async () => {
+        // Ensure getSession is mocked to simulate no user session for this test as well
+        connection.auth.getSession.mockResolvedValueOnce({ data: { session: null } });
+
+        render(<Home />);
+        const signUpButton = await screen.findByRole('button', { name: /sign up/i });
+        expect(signUpButton).toBeInTheDocument();
+    });
+
+    it('displays dropdown menu when profile picture is clicked', async () => {
+
+        connection.auth.getSession.mockResolvedValue({
+            data: { session: { user: { email: "test@example.com" } } }
+        });
+
+        render(<Home />);
+
+        const profilePicture = await screen.findByAltText('profile');
+        await userEvent.click(profilePicture);
+
+        // Check for the presence of dropdown menu items
+        const profileOption = await screen.findByText('Profile');
+        const dashboardOption = await screen.findByText('Dashboard');
+        const rentingOption = await screen.findByText('Renting');
+
+        expect(profileOption).toBeInTheDocument();
+        expect(dashboardOption).toBeInTheDocument();
+        expect(rentingOption).toBeInTheDocument();
+    });
+
+
+
 });
+
+

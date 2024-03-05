@@ -10,7 +10,8 @@ export default function Home() {
             <div className="bg-[#FFFFFF]">
                 <div className="flex justify-center h-screen">
                     <div className="bg-cover lg:block lg:w-2/3"
-                         style={{backgroundImage: 'url("https://images.rentals.ca/property-pictures/large/mississauga-on/253705/apartment-17442588.jpg")'}}>
+                         style={{backgroundImage: 'url("https://images.rentals.ca/property-pictures/large/mississauga-on/253705/apartment-17442588.jpg")'}}
+                         data-testid="background-image">
                         <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-40">
                             <div>
                                 <h2 className="text-2xl font-bold text-white sm:text-3xl">Home Haven</h2>
