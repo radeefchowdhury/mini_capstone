@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest",
+    "test": "jest --coverage",
     "test:watch": "jest --watch"
   },
   "dependencies": {
@@ -15,6 +15,7 @@
     "@supabase/supabase-js": "^2.39.3",
     "classnames": "^2.5.1",
     "next": "14.1.0",
+    "node": "^21.6.2",
     "react": "^18",
     "react-dom": "^18"
   },
