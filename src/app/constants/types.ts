@@ -6,5 +6,11 @@ export interface UserProfileType {
     phone_number?: number;
     profile_picture?: string;
     role?: string;
-    registration_key?: string;
+}
+
+export interface CompanyType {
+    id?: string;
+    name?: string;
+    phone_number?: number;
+    email?: string;
 }

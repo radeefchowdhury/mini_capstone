@@ -58,7 +58,7 @@ export default function RootLayout({children}: {
                         />
                     )}
                     {/* Render the main content */}
-                    <main className={`${marginExpanded ? 'sm:ml-[255px]' : 'sm:ml-[79px]'} `}>{children}</main>
+                    <main className={`${marginExpanded ? 'sm:ml-[255px]' : 'sm:ml-[79px]'} p-8 mt-2 sm:mt-8`}>{children}</main>
                 </div>
             </div>
         </>

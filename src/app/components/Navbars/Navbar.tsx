@@ -20,6 +20,8 @@ function Navbar(props: NavbarProps) {
     const signout = async () => {
         try {
             await supabase.auth.signOut();
+            // Remove user_role from local storage
+            localStorage.removeItem('user_role');
             window.location.href = '/';
         } catch (error: any) {
             console.error('Error signing out:', error.message);

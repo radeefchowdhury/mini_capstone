@@ -2,6 +2,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
+import {BuildingOffice2Icon} from "@heroicons/react/24/outline";
 
 export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
     // Define state for sidebar expansion
@@ -83,14 +84,15 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                                 href="/dashboard/profile"
                                 className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
                             >
-                                <span className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                <span
+                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
                                     <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      fill="none"
-                                      viewBox="0 0 24 24"
-                                      strokeWidth={1.5}
-                                      stroke="currentColor"
-                                      className="w-6 h-6"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        strokeWidth={1.5}
+                                        stroke="currentColor"
+                                        className="w-6 h-6"
                                     >
                                     <path
                                         strokeLinecap="round"
@@ -99,13 +101,34 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
                                     />
                                     </svg>
                                     <span
-                                      className={`${
-                                          sidebarExpanded
-                                              ? "sm:hidden ml-0"
-                                              : "ml-3 block"
-                                      } ml-3 whitespace-nowrap `}
+                                        className={`${
+                                            sidebarExpanded
+                                                ? "sm:hidden ml-0"
+                                                : "ml-3 block"
+                                        } ml-3 whitespace-nowrap `}
                                     >
                                     Edit Profile
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                onClick={() => setSidebarOpen(false)}
+                                href="/dashboard/properties"
+                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
+                            >
+                                <span
+                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                    <BuildingOffice2Icon className={"w-6"}/>
+                                    <span
+                                        className={`${
+                                            sidebarExpanded
+                                                ? "sm:hidden ml-0"
+                                                : "ml-3 block"
+                                        } ml-3 whitespace-nowrap `}
+                                    >
+                                    View Properties
                                     </span>
                                 </span>
                             </a>
@@ -115,7 +138,7 @@ export default function SideNav({ sidebarOpen, setSidebarOpen }: any) {
 
                 {/* Expand / collapse button */}
                 <div className="pt-3 sm:inline-flex  mt-auto ">
-                    <div className="flex-1" />
+                    <div className="flex-1"/>
                     <div className="px-3 py-2 justify-end">
                         <button onClick={() => {
                             setSidebarExpanded(!sidebarExpanded);

@@ -3,6 +3,7 @@
 import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
 import {useRouter} from "next/navigation";
+import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
 
 const Login = () => {
 
@@ -28,7 +29,17 @@ const Login = () => {
         })
             .then((res) => {
                 if (res.error) setError(res.error.message)
-                else router.push('/')
+                else{
+                    getUserProfile().then((res) => {
+                        if (res.data) {
+                            // Add a user_role in local storage
+                            const user_role = res.data[0]?.role
+                            if (user_role) localStorage.setItem('user_role', user_role.toUpperCase())
+                            else localStorage.setItem('user_role', 'COMPANY')
+                            router.push('/')
+                        }
+                    })
+                }
             })
             .catch(console.error)
     }
