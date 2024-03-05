@@ -1,15 +1,33 @@
+"use client"
 import DashboardPanel from "@/app/components/Dashboard/DashboardPanel";
-
+import React, {useEffect} from "react";
+import CondoTable from "@/app/dashboard/properties/CondoTable";
 function Page() {
 
-    // Title = 'My Rented Unit' if the user_role is a renter
-    // Title = 'My Units' if the user_role is a owner
-    // Title = 'My Properties' if the user_role is a company
+    const [userType, setUserType] = React.useState<'RENTER' | 'OWNER' | 'COMPANY' | null>(null);
 
+
+    const registerNewUnit = () => {
+        // Redirect to the register new unit page
+    }
+
+    useEffect(() => {
+        if(typeof window === 'undefined') return;
+        setUserType(localStorage.getItem('user_role') as 'RENTER' | 'OWNER' | 'COMPANY' | null);
+    }, []);
 
     return (
-        <div>
-            <DashboardPanel title={'My Rented Unit'} buttonTitle={'Register New Unit'} onClick={() => {}}/>
+        <div className={"flex flex-row sm:gap-[36px] gap-[28px]"}>
+            <div className={"w-full"}>
+                <DashboardPanel
+                    title={'My Rented Units'}
+                    buttonTitle={'Register New Unit'}
+                    children={<CondoTable />}
+                    onClick={registerNewUnit}/>
+            </div>
+            <div className={"max-w-[370px]"}>
+                <DashboardPanel title={'Condo Unit Information'} onClick={() => {}}/>
+            </div>
         </div>
     );
 }

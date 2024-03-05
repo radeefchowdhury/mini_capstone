@@ -36,6 +36,7 @@ const Login = () => {
                             const user_role = res.data[0]?.role
                             if (user_role) localStorage.setItem('user_role', user_role.toUpperCase())
                             else localStorage.setItem('user_role', 'COMPANY')
+                            localStorage.setItem('user_id', res.data[0]?.id)
                             router.push('/')
                         }
                     })

@@ -8,7 +8,6 @@ export const getUserSession = async () => {
     return res.data.session
 }
 export const submitUserProfile = async (userProfile:UserProfileType) => {
-    console.log(userProfile)
     supabase
         .from('UserProfile')
         .upsert([userProfile])

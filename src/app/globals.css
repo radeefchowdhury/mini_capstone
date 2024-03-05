@@ -2,4 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    table{
+        @apply rounded-lg bg-gray-900;
+    }
+    th{
+        @apply text-center whitespace-nowrap font-bold py-4 px-10 text-white font-medium;
+    }
+    tr{
+        @apply border-t;
+    }
+    td{
+        @apply text-center whitespace-nowrap py-3 px-10;
+    }
+    tbody{
+        @apply bg-white;
+    }
+}
 
+table{
+    outline: 1px solid #e3e5ea;
+}

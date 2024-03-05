@@ -11,27 +11,18 @@ import {
 import {getCompanyProfile, submitCompanyProfile} from "@/app/api/company/CompanyAPI";
 
 function Page() {
+    const windowClassName = "w-full p-6 bg-white shadow-sm rounded-md";
+
     const [userType, setUserType] = React.useState<'RENTER' | 'OWNER' | 'COMPANY' | null>(null);
     const [userProfile, setUserProfile] = React.useState<UserProfileType>({} as UserProfileType);
     const [companyProfile, setCompanyProfile] = React.useState<CompanyType>({} as CompanyType);
-    const windowClassName = "w-full p-6 bg-white shadow-sm rounded-md";
 
-    const [keyVisible, setKeyVisible] = React.useState<boolean>(false);
-    const [editable, setEditable] = React.useState(false);
+    const [profilePictureFile, setProfilePictureFile] = React.useState<File | null>(null);
     const [uploading, setUploading] = React.useState(false);
 
     const [profileError, setProfileError] = React.useState<string>('');
     const [fileError, setFileError] = React.useState<string>('');
 
-    const [profilePictureFile, setProfilePictureFile] = React.useState<File | null>(null);
-
-    const handleToggleVisibility = () => {
-        setKeyVisible(!keyVisible);
-    };
-
-    const handleToggleEdit = () => {
-        setEditable(!editable);
-    };
 
     const saveProfileChanges = () => {
         setProfileError('');
