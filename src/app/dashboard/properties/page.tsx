@@ -9,7 +9,7 @@ function Page() {
     const [userId, setUserId] = React.useState<string>();
 
     const registerNewProperty = () => {
-        // Redirect to the register new unit page
+
     }
 
     useEffect(() => {
