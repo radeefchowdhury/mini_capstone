@@ -29,7 +29,6 @@ function Page() {
 
     const registerNewProperty = () => {
         setFormAction('CREATE')
-
     }
 
     const submitNewProperty = () => {

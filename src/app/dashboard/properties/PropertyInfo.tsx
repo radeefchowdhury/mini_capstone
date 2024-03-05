@@ -63,7 +63,6 @@ function PropertyInfo(props: PropertyInfoProps) {
                     type="number" id="locker_count" name="locker_count"
                     className="p-2 w-[100px] md:w-[150px] lg:w-[250px] xl:w-[120px] border border-slate-300 focus:outline-slate-500 rounded-md"/>
             </div>
-
         </div>
     );
 }

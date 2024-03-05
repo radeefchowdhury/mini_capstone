@@ -23,12 +23,42 @@ export const submitPropertyProfile = async (propertyProfile: any) => {
 export const getCondoListFromPublicUser = async (id: any) => {
     const {data, error} = await supabase
         .from('CondoUnit')
-        .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(address)')
+        .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(name, address)')
         .eq('occupied_by', id)
     return {data, error}
 }
 
 export const getCondoListFromCompany = async (id: any) => {
-
+    const {data, error} = await supabase
+        .from('CondoUnit')
+        .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(name, address), Occupant:UserProfile(first_name)')
+        .eq('property.company_id', id)
+    console.log(data)
+    return {data, error}
 }
 
+export const getPropertyIdByName = async (name: any) => {
+    const {data, error} = await supabase
+        .from('Property')
+        .select('id')
+        .eq('name', name)
+    return {data, error}
+}
+
+export const submitCondoProfile = async (condoProfile: any) => {
+    console.log(condoProfile)
+    supabase
+        .from('CondoUnit')
+        .insert([condoProfile])
+        .then(res => {console.log(res)})
+    window.location.reload()
+}
+
+export const updateRegistrationKey = async (id: any, key: any) => {
+    supabase
+        .from('CondoUnit')
+        .update({registration_key: key})
+        .eq('id', id)
+        .then(res => {console.log(res)})
+    window.location.reload()
+}

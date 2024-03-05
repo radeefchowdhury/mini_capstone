@@ -54,6 +54,7 @@ export interface CondoUnitType {
     registration_key?: string;
     occupied_by?: string; // Foreign key to UserProfile
     property_id: string; // Foreign key to Property
+    property_name?: string;
     property: PropertyType;
     parking_spots: ParkingSpotType[];
     lockers: LockerType[];
