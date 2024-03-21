@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd src
+    - run: cd srctest
     - run: npm ci
     - run: npm run dev
     - name: Run Jest Tests
