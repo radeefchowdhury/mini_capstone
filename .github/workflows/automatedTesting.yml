@@ -17,12 +17,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Use Jest ${{ matrix.node-version }}
+    - name: Set up Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd src
-    - run: npm install
-    - run: npm run dev
+    - name: Change to src directory
+      run: cd src
+    - name: Install dependencies
+      run: npm install
+      working-directory: ./src
+    - name: Start development server
+      run: npm run dev
+      working-directory: ./src
     - name: Run Jest Tests
       run: npm test
+      working-directory: ./src
