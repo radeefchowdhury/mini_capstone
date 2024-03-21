@@ -4,13 +4,14 @@ import React, {useEffect} from "react";
 import {
     getCondoListFromCompany,
     getCondoListFromPublicUser,
-    getPropertyIdByName,
+    getPropertyIdByName, registerCondoUnitWithKey,
     submitCondoProfile, updateRegistrationKey
 } from "@/app/api/property/PropertyAPI";
 import {CondoUnitType, UserType} from "@/app/constants/types";
 import DashboardTable from "@/app/components/Dashboard/DashboardTable";
 import CondoUnitInfo from "@/app/dashboard/units/CondoUnitInfo";
 import ActionButton from "@/app/components/Dashboard/ActionButton";
+import KeyForm from "@/app/dashboard/units/KeyForm";
 
 const condoTableHeaders = [
     {name: 'Condo Name', key: 'name'},
@@ -46,6 +47,7 @@ function Page() {
     const [selectedCondo, setSelectedCondo] = React.useState<string>();
     const [newCondoProfile, setNewCondoProfile] = React.useState<CondoUnitType>({} as CondoUnitType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
+    const [registrationKey, setRegistrationKey] = React.useState<string>("");
 
 
     const registerNewUnit = () => {
@@ -65,6 +67,12 @@ function Page() {
     const generateRegistrationKey = async (unit_id: any) => {
         const key = generateUUID();
         await updateRegistrationKey(unit_id, key).catch(console.error)
+    }
+
+    const registerCondoWithKey = () => {
+        if(!registrationKey) return
+        console.log(userId, registrationKey)
+        registerCondoUnitWithKey(userId, registrationKey).catch(console.error)
     }
     const submitNewUnit = () => {
         getPropertyIdByName(newCondoProfile.property_name).then((res ) => {
@@ -171,13 +179,21 @@ function Page() {
                         children={<DashboardTable items={filteredCondoData} headers={condoTableHeadersForCompany} />}
                         onClick={registerNewUnit}/>}
             </div>
+            {(selectedCondo || formAction) &&
             <div className={"min-w-[370px]"}>
+                {(userType == UserType.COMPANY) &&
                 <DashboardPanel
                     title={`${formAction == "EDIT" ? 'Edit Condo' : 'Create New Condo'}`}
                     buttonTitle={`${formAction == "EDIT" ? 'Save' : 'Submit'}`}
                     children={<CondoUnitInfo unit={newCondoProfile} setUnit={setNewCondoProfile}/>}
-                    onClick={submitNewUnit}/>
-            </div>
+                    onClick={submitNewUnit}/>}
+                {(userType == UserType.RENTER || userType == UserType.OWNER) &&
+                <DashboardPanel
+                    title={`${formAction == "EDIT" ? 'Edit Condo' : 'Create New Condo'}`}
+                    buttonTitle={`${formAction == "EDIT" ? 'Save' : 'Submit Key'}`}
+                    children={<KeyForm registration_key={registrationKey} setKey={setRegistrationKey}/>}
+                    onClick={registerCondoWithKey}/>}
+            </div>}
         </div>
     );
 }

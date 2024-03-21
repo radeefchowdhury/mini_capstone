@@ -38,6 +38,7 @@ const Login = () => {
                                 localStorage.setItem('user_id', res.data[0]?.id)
 
                             } else {
+                                console.log("here")
                                 localStorage.setItem('user_role', 'COMPANY')
                                 getCompanyProfile().then((res) => {
                                     console.log(res)

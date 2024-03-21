@@ -62,3 +62,12 @@ export const updateRegistrationKey = async (id: any, key: any) => {
         .then(res => {console.log(res)})
     window.location.reload()
 }
+
+export const registerCondoUnitWithKey = async (user_id: any, key: any) => {
+    supabase
+        .from('CondoUnit')
+        .update({occupied_by: user_id})
+        .eq('registration_key', key)
+        .then(res => {console.log(res)})
+    window.location.reload()
+}
