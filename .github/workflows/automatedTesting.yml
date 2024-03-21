@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [18.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -25,9 +25,6 @@ jobs:
       run: cd src
     - name: Install dependencies
       run: npm install
-      working-directory: ./src
-    - name: Start development server
-      run: npm run dev
       working-directory: ./src
     - name: Run Jest Tests
       run: npm test
