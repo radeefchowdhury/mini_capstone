@@ -38,24 +38,24 @@ export default function Home() {
         <main>
             <Navbar/>
             <Hero/>
-            <nav className={"mt-4 gap-4 flex justify-center"}>
+            {/*<nav className={"mt-4 gap-4 flex justify-center"}>*/}
 
-                <button onClick={() => window.location.href = '/login'}
-                        className={"bg-blue-500 w-20 p-2 rounded-md hover:bg-blue-600 text-white"}>Log in
-                </button>
-                <button onClick={() => window.location.href = '/signup'}
-                        className={"bg-blue-500 w-20 p-2 rounded-md hover:bg-blue-600 text-white"}>Sign up
-                </button>
-            </nav>
+            {/*    <button onClick={() => window.location.href = '/login'}*/}
+            {/*            className={"bg-blue-500 w-20 p-2 rounded-md hover:bg-blue-600 text-white"}>Log in*/}
+            {/*    </button>*/}
+            {/*    <button onClick={() => window.location.href = '/signup'}*/}
+            {/*            className={"bg-blue-500 w-20 p-2 rounded-md hover:bg-blue-600 text-white"}>Sign up*/}
+            {/*    </button>*/}
+            {/*</nav>*/}
 
-            <div className={"mt-10 p-4 text-center flex flex-col gap-4 items-center"}>
-                <h1>Home</h1>
+            {/*<div className={"mt-10 p-4 text-center flex flex-col gap-4 items-center"}>*/}
+            {/*    <h1>Home</h1>*/}
 
-                <p><b>Logged in as:</b> {userData || "not logged in"}</p>
-                <button onClick={signout} className={"bg-red-500 w-20 p-2 rounded-md hover:bg-red-600 text-white"}>Sign
-                    out
-                </button>
-            </div>
+            {/*    <p><b>Logged in as:</b> {userData || "not logged in"}</p>*/}
+            {/*    <button onClick={signout} className={"bg-red-500 w-20 p-2 rounded-md hover:bg-red-600 text-white"}>Sign*/}
+            {/*        out*/}
+            {/*    </button>*/}
+            {/*</div>*/}
         </main>
     );
 }

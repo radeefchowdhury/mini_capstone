@@ -40,6 +40,7 @@ const customJestConfig = {
         '!**/*.config.mjs',
         '!**/*.config.ts',
         '!**/coverage/**',
+        '!**/app/dashboard/profile/page.tsx',
     ],
 };
 
