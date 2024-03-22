@@ -22,7 +22,7 @@ function DashboardTable(props: DashboardTableProps) {
                     {items.map((item, index) => (
                         <tr key={index}>
                             {headers.map((header, index) => (
-                                <td key={index}>{item[header.key]}</td>
+                                <td key={index}>{item[header.key] || ""}</td>
                             ))}
                         </tr>
                     ))}

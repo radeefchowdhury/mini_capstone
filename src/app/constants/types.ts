@@ -18,6 +18,10 @@ export interface PropertyType {
     id: number;
     name: string;
     address: string;
+    description: string;
+    unit_count: number;
+    parking_count: number;
+    locker_count: number;
     company_id: string;
 }
 
@@ -50,6 +54,7 @@ export interface CondoUnitType {
     registration_key?: string;
     occupied_by?: string; // Foreign key to UserProfile
     property_id: string; // Foreign key to Property
+    property_name?: string;
     property: PropertyType;
     parking_spots: ParkingSpotType[];
     lockers: LockerType[];
