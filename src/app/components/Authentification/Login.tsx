@@ -56,7 +56,7 @@ const Login = () => {
 
                     })
                 }
-                // window.location.href = '/'
+                window.location.href = '/'
             })
             .catch(console.error)
     }
