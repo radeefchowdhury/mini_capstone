@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ActionIconProps {
-    Icon: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>> & { title?: string, titleId?: string } & React.RefAttributes<SVGSVGElement>>;
+    Icon: any;
     onClick: () => void;
 }
 function ActionIcon(props: ActionIconProps) {
@@ -9,7 +9,7 @@ function ActionIcon(props: ActionIconProps) {
     return (
         <Icon
             onClick={props.onClick}
-            className={"flex items-center justify-center py-1 px-3 mx-auto bg-blue-500 text-white text-sm rounded-md"}
+            className={"flex items-center text-black justify-center mx-auto w-6 rounded-md cursor-pointer"}
         />
     );
 }
