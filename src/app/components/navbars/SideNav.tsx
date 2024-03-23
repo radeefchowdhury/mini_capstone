@@ -2,7 +2,13 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import {BuildingOffice2Icon, BuildingOfficeIcon} from "@heroicons/react/24/outline";
+import {
+    BuildingOffice2Icon,
+    BuildingOfficeIcon,
+    CurrencyDollarIcon, PencilSquareIcon,
+    QueueListIcon,
+    Squares2X2Icon
+} from "@heroicons/react/24/outline";
 import {UserType} from "@/app/constants/types";
 
 interface SideNavProps {
@@ -10,6 +16,22 @@ interface SideNavProps {
     setSidebarOpen: any;
     userType?: UserType;
 }
+
+interface NavItem {
+    name: string;
+    icon: any;
+    link: string;
+    userTypes: UserType[];
+}
+
+const navItems = [
+    { name: "Edit Profile", icon: PencilSquareIcon, link: "/dashboard/profile", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY] },
+    { name: "View Properties", icon: BuildingOffice2Icon, link: "/dashboard/properties", userTypes: [UserType.COMPANY] },
+    { name: "View Units", icon: BuildingOfficeIcon, link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY] },
+    { name: "View Operations", icon: Squares2X2Icon, link: "/dashboard/operations", userTypes: [UserType.COMPANY] },
+    { name: "View Finances", icon: CurrencyDollarIcon, link: "/dashboard/finances", userTypes: [UserType.COMPANY] },
+    { name: "View Requests", icon: QueueListIcon, link: "/dashboard/requests", userTypes: [UserType.OWNER] },
+]
 
 export default function SideNav(props: SideNavProps) {
     // Destructure props
@@ -50,7 +72,7 @@ export default function SideNav(props: SideNavProps) {
             >
                 {/* Sidebar header */}
                 <div className="flex justify-between pr-3 sm:px-2">
-                    {/* Sidebar Logo */}
+                    {/* Sidebar logo */}
                     <a href="/">
                         <span
                             className={`${
@@ -88,84 +110,29 @@ export default function SideNav(props: SideNavProps) {
                     </p>
                     <ul className="space-y-2">
                         {userType &&
-                        <li>
-                            <a
-                                onClick={() => setSidebarOpen(false)}
-                                href="/dashboard/profile"
-                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
-                            >
-                                <span
-                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        strokeWidth={1.5}
-                                        stroke="currentColor"
-                                        className="w-6 h-6"
-                                    >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-                                    />
-                                    </svg>
-                                    <span
-                                        className={`${
-                                            sidebarExpanded
-                                                ? "sm:hidden ml-0"
-                                                : "ml-3 block"
-                                        } ml-3 whitespace-nowrap `}
-                                    >
-                                    Edit Profile
-                                    </span>
-                                </span>
-                            </a>
-                        </li>}
-                        {userType === UserType.COMPANY &&
-                            <li>
-                            <a
-                                onClick={() => setSidebarOpen(false)}
-                                href="/dashboard/properties"
-                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
-                            >
-                                <span
-                                    className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
-                                    <BuildingOffice2Icon className={"w-6"}/>
-                                    <span
-                                        className={`${
-                                            sidebarExpanded
-                                                ? "sm:hidden ml-0"
-                                                : "ml-3 block"
-                                        } ml-3 whitespace-nowrap `}
-                                    >
-                                    View Properties
-                                    </span>
-                                </span>
-                            </a>
-                        </li>}
-                        {(userType === UserType.RENTER || userType === UserType.OWNER || userType === UserType.COMPANY) &&
-                        <li>
-                            <a
-                                onClick={() => setSidebarOpen(false)}
-                                href="/dashboard/units"
-                                className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
-                            >
-                            <span
-                                className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
-                                <BuildingOfficeIcon className={"w-6"}/>
-                                <span
-                                    className={`${
-                                        sidebarExpanded
-                                            ? "sm:hidden ml-0"
-                                            : "ml-3 block"
-                                    } ml-3 whitespace-nowrap `}
+                        navItems.filter((item) => item.userTypes.includes(userType)).map((item) => (
+                            <li key={item.name}>
+                                <a
+                                    onClick={() => setSidebarOpen(false)}
+                                    href={item.link}
+                                    className="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100  font-light hover:font-semibold"
                                 >
-                                View Units
-                                </span>
-                            </span>
-                            </a>
-                        </li>}
+                                    <span
+                                        className="flex items-center text-base text-gray-900 rounded-lg hover:bg-gray-100  hover:font-semibold">
+                                        <item.icon className={"w-6"}/>
+                                        <span
+                                            className={`${
+                                                sidebarExpanded
+                                                    ? "sm:hidden ml-0"
+                                                    : "ml-3 block"
+                                            } ml-3 whitespace-nowrap `}
+                                        >
+                                        {item.name}
+                                        </span>
+                                    </span>
+                                </a>
+                            </li>
+                        ))}
                     </ul>
                 </div>
 

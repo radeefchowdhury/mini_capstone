@@ -7,9 +7,9 @@ import {
     getFilesFromProperty,
     uploadCondoFile
 } from "@/app/api/property/PropertyAPI";
-import PopupPanel from "@/app/components/Dashboard/PopupPanel";
-import DashboardTable from "@/app/components/Dashboard/DashboardTable";
-import ActionIcon from "@/app/components/Dashboard/ActionIcon";
+import PopupPanel from "@/app/components/dashboard/PopupPanel";
+import DashboardTable from "@/app/components/dashboard/DashboardTable";
+import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {ArrowDownTrayIcon, ArrowLeftIcon, PencilSquareIcon} from "@heroicons/react/24/outline";
 
 interface PropertyFilesViewProps {

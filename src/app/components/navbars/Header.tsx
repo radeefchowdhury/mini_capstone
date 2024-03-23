@@ -3,14 +3,30 @@ import React, {useEffect, useRef, useState} from 'react';
 import Logo from "@/app/components/logo/Logo";
 import supabase from "@/app/api/supabase/SupabaseContextProvider";
 import classNames from "classnames";
+import {UserType} from "@/app/constants/types";
 
 interface NavbarProps {
     dynamic?: boolean;
 }
 
-function Navbar(props: NavbarProps) {
+interface dropdownItem {
+    name: string;
+    link: string;
+    userTypes: UserType[];
+}
+
+const dropdownItems: dropdownItem[] = [
+    {name: "Edit Profile", link: "/dashboard/profile", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY]},
+    {name: "View Properties", link: "/dashboard/properties", userTypes: [UserType.COMPANY]},
+    {name: "View Units", link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY]},
+    {name: "View Operations", link: "/dashboard/operations", userTypes: [UserType.COMPANY]},
+    {name: "View Finances", link: "/dashboard/finances", userTypes: [UserType.COMPANY]},
+    {name: "View Requests", link: "/dashboard/requests", userTypes: [UserType.OWNER]}
+]
+
+function Header(props: NavbarProps) {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-    const [userType, setUserType] = useState<string>('public');
+    const [userType, setUserType] = useState<UserType>(UserType.DISCONNECTED);
     const [toggleDropdown, setToggleDropdown] = useState<boolean>(false);
     const [isScrolled, setIsScrolled] = useState<boolean>(true);
     const [isDynamic, setIsDynamic] = useState<boolean>(props.dynamic || true);
@@ -47,6 +63,10 @@ function Navbar(props: NavbarProps) {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+    useEffect(() => {
+        setUserType(localStorage.getItem('user_role') as unknown as UserType);
+    }, [userType]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -91,21 +111,15 @@ function Navbar(props: NavbarProps) {
                                  className={'cursor-pointer focus:ring-1 focus:ring-offset-2 mx-auto bg-red-600 w-11 h-11 rounded-full'} src="/default_profile_picture.png"
                                  alt="profile"/>
                             <div ref={dropdownRef}
-                                className={`${toggleDropdown ? 'opacity-100' : 'opacity-0'}  transition-opacity absolute xl:right-[-70px] right-[5px] top-[56px] text-gray-600 inline-block z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44`}>
-                                <ul className="py-2 text-sm">
-                                    <li>
-                                        <a href="/dashboard/profile"
-                                           className="block px-4 py-2 hover:bg-gray-100">Profile</a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           className="block px-4 py-2 hover:bg-gray-100">Dashboard</a>
-                                    </li>
-                                    <li>
-                                        <a href="#"
-                                           className="block px-4 py-2 hover:bg-gray-100">Renting</a>
-                                    </li>
-                                </ul>
+                                className={`${toggleDropdown ? 'opacity-100' : 'opacity-0'}  pt-2 transition-opacity absolute xl:right-[-70px] right-[5px] top-[56px] text-gray-600 inline-block z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44`}>
+                                <div className={"pb-2"}>
+                                {dropdownItems.filter((item) => item.userTypes.includes(userType as UserType)).map((item) => (
+                                    <div key={item.name} className="" onClick={() => setToggleDropdown(false)}>
+                                        <a href={item.link}
+                                           className="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-800">{item.name}</a>
+                                    </div>
+                                ))}
+                                </div>
                                 <div className="py-2" onClick={signout}>
                                     <a href="#"
                                        className="block px-4 py-2 text-sm hover:bg-red-50 hover:text-red-800">Sign out
@@ -125,4 +139,4 @@ function Navbar(props: NavbarProps) {
     );
 }
 
-export default Navbar;
+export default Header;
