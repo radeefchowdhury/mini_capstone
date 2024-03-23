@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ActionIcon from '../app/components/Dashboard/ActionIcon'; 
+import ActionIcon from '@/app/components/dashboard/ActionIcon';
 
 // Mock Icon component
 const MockIcon = React.forwardRef((props, ref) => (

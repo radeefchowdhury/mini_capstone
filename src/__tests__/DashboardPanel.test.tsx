@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DashboardPanel from '../app/components/Dashboard/DashboardPanel';
+import DashboardPanel from '@/app/components/dashboard/DashboardPanel';
 
 describe('DashboardPanel', () => {
     // Test for rendering the title
