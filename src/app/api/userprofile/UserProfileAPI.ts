@@ -1,4 +1,4 @@
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {UserProfileType} from "@/app/constants/types";
 
 const supabase = connection;

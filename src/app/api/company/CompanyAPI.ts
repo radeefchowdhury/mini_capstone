@@ -1,4 +1,4 @@
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {CompanyType} from "@/app/constants/types";
 
 const supabase = connection;
