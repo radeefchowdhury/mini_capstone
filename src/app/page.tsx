@@ -1,8 +1,8 @@
 "use client";
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {useEffect, useState} from "react";
-import Navbar from "@/app/components/Navbars/Navbar";
-import Hero from "@/app/components/Landing/Hero";
+import Navbar from "@/app/components/navbars/Navbar";
+import Hero from "@/app/components/landing/Hero";
 
 export default function Home() {
     const [userData, setUserData] = useState<any>(null)
