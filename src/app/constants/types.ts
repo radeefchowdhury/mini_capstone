@@ -2,7 +2,8 @@
 export enum UserType {
     RENTER = "RENTER",
     OWNER = "OWNER",
-    COMPANY = "COMPANY"
+    COMPANY = "COMPANY",
+    DISCONNECTED = "DISCONNECTED"
 }
 export interface UserProfileType {
     id?: string;

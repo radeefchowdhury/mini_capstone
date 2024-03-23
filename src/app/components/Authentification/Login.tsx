@@ -4,6 +4,7 @@ import {useState} from "react";
 import connection from "@/app/api/supabase/supabase";
 import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
 import {getCompanyProfile} from "@/app/api/company/CompanyAPI";
+import {UserType} from "@/app/constants/types";
 
 const Login = () => {
 
@@ -27,34 +28,39 @@ const Login = () => {
             password,
         })
             .then((res) => {
-                if (res.error) setError(res.error.message)
-                else{
-                    getUserProfile().then((res) => {
-                        if (res.data) {
-                            // Add a user_role in local storage
-                            const user_role = res.data[0]?.role
-                            if (user_role){
-                                localStorage.setItem('user_role', user_role.toUpperCase())
-                                localStorage.setItem('user_id', res.data[0]?.id)
-
-                            } else {
-                                console.log("here")
-                                localStorage.setItem('user_role', 'COMPANY')
-                                getCompanyProfile().then((res) => {
-                                    console.log(res)
-                                    if (res.data) {
-                                        localStorage.setItem('user_id', res.data[0].id)
-                                    }
-                                })
-                            }
-                            window.location.href = '/'
-                        }
-                    })
-
+                // console.log("sign in: ", res)
+                if (res.error) {
+                    setError(res.error.message)
+                    return
                 }
+                else {
+                    console.log("setting user id: ", res.data.user.id)
+                    localStorage.setItem("user_id", res.data.user.id)
+                    getUserProfile().then((res) => {
+                        if (res.error) {
+                            setError(res.error.message)
+                            return
+                        }
+                        // This is a public user
+                        if(res.data && res.data?.length != 0) {
+                            console.log("setting user type: ", res.data[0].role)
+                            localStorage.setItem("user_role", res.data[0].role)
+                        }
+                        // This is a company user
+                        else {
+                            getCompanyProfile().then((res) => {
+                                console.log("Setting Company user")
+                                localStorage.setItem("user_role", UserType.COMPANY)
+                            })
+                        }
+
+                    })
+                }
+                // window.location.href = '/'
             })
             .catch(console.error)
     }
+
 
     const handleSubmit =  async (event:any) => {
         event.preventDefault();
