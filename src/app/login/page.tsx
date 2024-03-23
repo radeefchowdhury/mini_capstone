@@ -1,5 +1,5 @@
-import Login from "@/app/components/Authentification/Login";
-import Logo from "@/app/components/Logo/Logo";
+import Login from "@/app/components/authentification/Login";
+import Logo from "@/app/components/logo/Logo";
 
 export default function Home() {
 

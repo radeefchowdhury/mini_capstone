@@ -1,5 +1,5 @@
 "use client"
-import DashboardPanel from "@/app/components/Dashboard/DashboardPanel";
+import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
 import React, {useEffect} from "react";
 import {
     getCondoListFromCompany,
@@ -8,11 +8,11 @@ import {
     submitCondoProfile, updateRegistrationKey
 } from "@/app/api/property/PropertyAPI";
 import {CondoUnitType, UserType} from "@/app/constants/types";
-import DashboardTable from "@/app/components/Dashboard/DashboardTable";
+import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import CondoUnitInfo from "@/app/dashboard/units/CondoUnitInfo";
-import ActionButton from "@/app/components/Dashboard/ActionButton";
+import ActionButton from "@/app/components/dashboard/ActionButton";
 import KeyForm from "@/app/dashboard/units/KeyForm";
-import ActionIcon from "@/app/components/Dashboard/ActionIcon";
+import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {PencilSquareIcon} from "@heroicons/react/24/outline";
 
 const condoTableHeaders = [
