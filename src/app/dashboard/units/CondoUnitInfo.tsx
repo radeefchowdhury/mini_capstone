@@ -23,7 +23,7 @@ function CondoUnitInfo(props: CondoUnitInfoProps) {
                 <label htmlFor="Property Name" className="">Property Name</label>
                 <input
                     pattern={"[A-Za-z]*"}
-                    value={unit.property_name || ""}
+                    value={unit.property_name || unit.property.name || ""}
                     onChange={(e) => setUnit({...unit, property_name: e.target.value})}
                     type="text" id="property_name"
                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
