@@ -14,6 +14,7 @@ const propertyTableHeaders = [
     {name: 'Unit Count', key: 'unit_count'},
     {name: 'Parking Count', key: 'parking_count'},
     {name: 'Locker Count', key: 'locker_count'},
+    {name: 'Condo files', key: 'condo_files'},
     {name: 'Actions', key: 'edit'},
 ]
 
@@ -23,12 +24,20 @@ function Page() {
     const [userId, setUserId] = React.useState<string>();
     const [propertyData, setPropertyData] = React.useState<PropertyType[]>([]);
     const [filteredPropertyData, setFilteredPropertyData] = React.useState<any[]>([]);
-    const [selectedProperty, setSelectedProperty] = React.useState<number>();
+    const [selectedProperty, setSelectedProperty] = React.useState<PropertyType>();
     const [newPropertyProfile, setNewPropertyProfile] = React.useState<PropertyType>({} as PropertyType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
 
+    const selectProperty = (property: PropertyType) => {
+        setSelectedProperty(property)
+        setFormAction('EDIT')
+    }
     const registerNewProperty = () => {
         setFormAction('CREATE')
+    }
+
+    const viewPropertyFiles = (property: PropertyType) => {
+        console.log(property)
     }
 
     const submitNewProperty = () => {
@@ -62,9 +71,8 @@ function Page() {
                 unit_count: property.unit_count,
                 parking_count: property.parking_count,
                 locker_count: property.locker_count,
-                edit: <ActionButton title={'Edit'} onClick={() => {
-                    console.log('edit ' + property.id )}
-                }/>
+                condo_files: <ActionButton title={'View Files'} onClick={() => viewPropertyFiles(property)}/>,
+                edit: <ActionButton title={'Edit'} onClick={() => selectProperty(property)}/>
             }
         })
         setFilteredPropertyData(filteredData)
@@ -84,14 +92,24 @@ function Page() {
                     children={<DashboardTable items={filteredPropertyData} headers={propertyTableHeaders} />}
                     onClick={registerNewProperty}/>
             </div>
-            { (selectedProperty || formAction == "CREATE") &&
+            {(formAction == "CREATE") &&
                 <div className={"min-w-[370px]"}>
                 <DashboardPanel
-                    title={`${formAction == "EDIT" ? 'Edit Property' : 'Create New Property'}`}
-                    buttonTitle={`${formAction == "EDIT" ? 'Save' : 'Submit'}`}
+                    title={`Create New Property`}
+                    buttonTitle={`Submit`}
                     children={<PropertyInfo property={newPropertyProfile} setProperty={setNewPropertyProfile}/>}
                     onClick={submitNewProperty}/>
-            </div>}
+                </div>
+            }
+            {(formAction == "EDIT") &&
+                <div className={"min-w-[370px]"}>
+                    <DashboardPanel
+                        title={`Edit Property`}
+                        buttonTitle={`Save`}
+                        children={<PropertyInfo property={selectedProperty || newPropertyProfile} setProperty={setSelectedProperty}/>}
+                        onClick={submitNewProperty}/>
+                </div>
+            }
         </div>
     );
 }

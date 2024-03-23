@@ -96,7 +96,7 @@ function Page() {
 
     }
 
-    const setCondoUnit = (unit: CondoUnitType) => {
+    const selectCondoUnit = (unit: CondoUnitType) => {
         setFormAction('EDIT')
         console.log(unit)
         setSelectedCondo(unit)
@@ -151,7 +151,7 @@ function Page() {
                     actions: (
                         <div className={"flex flex-row gap-2 py-2 px-3"}>
                             <ActionButton title={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
-                            <ActionIcon Icon={ArrowUpRightIcon} onClick={() => setCondoUnit(unit)}/>
+                            <ActionIcon Icon={ArrowUpRightIcon} onClick={() => selectCondoUnit(unit)}/>
                         </div>
                     )
                 }
@@ -198,7 +198,7 @@ function Page() {
                     <DashboardPanel
                     title={`Edit Condo`}
                     buttonTitle={`Save`}
-                    children={<CondoUnitInfo unit={selectedCondo || newCondoProfile} setUnit={setNewCondoProfile}/>}
+                    children={<CondoUnitInfo unit={selectedCondo || newCondoProfile} setUnit={setSelectedCondo}/>}
                     onClick={submitNewUnit}/>
                 }
                 {(userType == UserType.COMPANY) && formAction == "CREATE" &&
