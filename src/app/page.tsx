@@ -1,7 +1,7 @@
 "use client";
 import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {useEffect, useState} from "react";
-import Navbar from "@/app/components/navbars/Navbar";
+import Header from "@/app/components/navbars/Header";
 import Hero from "@/app/components/landing/Hero";
 
 export default function Home() {
@@ -39,7 +39,7 @@ export default function Home() {
 
     return (
         <main>
-            <Navbar/>
+            <Header/>
             <Hero/>
             {/*<nav className={"mt-4 gap-4 flex justify-center"}>*/}
 

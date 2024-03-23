@@ -1,14 +1,14 @@
 "use client"
-import DashboardPanel from "@/app/components/Dashboard/DashboardPanel";
+import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
 import React, {useEffect} from "react";
 import {PropertyType, UserType} from "@/app/constants/types";
 import {getPropertiesFromCompany, submitPropertyProfile} from "@/app/api/property/PropertyAPI";
-import ActionButton from "@/app/components/Dashboard/ActionButton";
+import ActionButton from "@/app/components/dashboard/ActionButton";
 import {log} from "node:util";
-import DashboardTable from "@/app/components/Dashboard/DashboardTable";
+import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import PropertyInfo from "@/app/dashboard/properties/PropertyInfo";
-import PopupPanel from "@/app/components/Dashboard/PopupPanel";
-import ActionIcon from "@/app/components/Dashboard/ActionIcon";
+import PopupPanel from "@/app/components/dashboard/PopupPanel";
+import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {PencilSquareIcon} from "@heroicons/react/24/outline";
 import PropertyFilesView from "@/app/dashboard/properties/PropertyFilesView";
 
