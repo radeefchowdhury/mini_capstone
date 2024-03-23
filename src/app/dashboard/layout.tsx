@@ -2,8 +2,8 @@
 
 // Import necessary components and hooks
 import { useEffect, useState } from "react";
-import SideNav from "@/app/components/Navbars/SideNav";
-import MobileHeader from "@/app/components/Navbars/MobileHeader";
+import SideNav from "@/app/components/navbars/SideNav";
+import MobileHeader from "@/app/components/navbars/MobileHeader";
 import {UserType} from "@/app/constants/types";
 
 // Define the RootLayout component
