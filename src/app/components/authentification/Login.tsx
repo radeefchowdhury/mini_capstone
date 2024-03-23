@@ -1,7 +1,7 @@
 "use client";
 
 import {useState} from "react";
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
 import {getCompanyProfile} from "@/app/api/company/CompanyAPI";
 import {UserType} from "@/app/constants/types";
