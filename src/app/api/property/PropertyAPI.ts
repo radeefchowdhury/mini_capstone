@@ -71,3 +71,49 @@ export const registerCondoUnitWithKey = async (user_id: any, key: any) => {
         .then(res => {console.log(res)})
     window.location.reload()
 }
+
+export const getFilesFromProperty = async (id: any) => {
+    // CondoFile(id, name, file, unit_id)
+    // CondoUnit(id, name, number, description, fee, size, registration_key, occupied_by, property_id)
+
+    const {data, error} = await supabase
+        .from('CondoFile')
+        .select('*, unit:CondoUnit(id, name)')
+        .eq('unit.property_id', id)
+    return {data, error}
+}
+
+export const getCondoIDFromName = async (name: any) => {
+    const {data, error} = await supabase
+        .from('CondoUnit')
+        .select('id')
+        .eq('name', name)
+    return {data, error}
+}
+
+export const uploadCondoFile = async (file: any, fileName: string) => {
+    await supabase
+        .storage
+        .from('condo_file_bucket')
+        .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: true
+        })
+        .catch(console.error)
+}
+
+export const createCondoFileInstance = async (file: any) => {
+    supabase
+        .from('CondoFile')
+        .insert([file])
+        .then(console.log)
+}
+export const getCondoFileURL = async (fileName: string) => {
+    const {data} = supabase
+        .storage
+        .from('condo_file_bucket')
+        .getPublicUrl(fileName)
+
+    return data.publicUrl
+}
+
