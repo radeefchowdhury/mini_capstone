@@ -13,7 +13,7 @@ import CondoUnitInfo from "@/app/dashboard/units/CondoUnitInfo";
 import ActionButton from "@/app/components/Dashboard/ActionButton";
 import KeyForm from "@/app/dashboard/units/KeyForm";
 import ActionIcon from "@/app/components/Dashboard/ActionIcon";
-import {ArrowUpRightIcon} from "@heroicons/react/24/outline";
+import {PencilSquareIcon} from "@heroicons/react/24/outline";
 
 const condoTableHeaders = [
     {name: 'Condo Name', key: 'name'},
@@ -76,6 +76,7 @@ function Page() {
         console.log(userId, registrationKey)
         registerCondoUnitWithKey(userId, registrationKey).catch(console.error)
     }
+
     const submitNewUnit = () => {
         getPropertyIdByName(newCondoProfile.property_name).then((res ) => {
             if(res.error){
@@ -93,7 +94,6 @@ function Page() {
             }
             submitCondoProfile(condoToSubmit).catch(console.error)
         }).catch(console.error)
-
     }
 
     const selectCondoUnit = (unit: CondoUnitType) => {
@@ -149,9 +149,9 @@ function Page() {
                     registration_key: unit.registration_key,
                     occupied_by: unit.occupied_by,
                     actions: (
-                        <div className={"flex flex-row gap-2 py-2 px-3"}>
+                        <div className={"flex flex-row gap-4 py-2 px-3"}>
                             <ActionButton title={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
-                            <ActionIcon Icon={ArrowUpRightIcon} onClick={() => selectCondoUnit(unit)}/>
+                            <ActionIcon Icon={PencilSquareIcon} onClick={() => selectCondoUnit(unit)}/>
                         </div>
                     )
                 }

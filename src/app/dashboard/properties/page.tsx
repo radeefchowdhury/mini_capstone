@@ -7,6 +7,10 @@ import ActionButton from "@/app/components/Dashboard/ActionButton";
 import {log} from "node:util";
 import DashboardTable from "@/app/components/Dashboard/DashboardTable";
 import PropertyInfo from "@/app/dashboard/properties/PropertyInfo";
+import PopupPanel from "@/app/components/Dashboard/PopupPanel";
+import ActionIcon from "@/app/components/Dashboard/ActionIcon";
+import {PencilSquareIcon} from "@heroicons/react/24/outline";
+import PropertyFilesView from "@/app/dashboard/properties/PropertyFilesView";
 
 const propertyTableHeaders = [
     {name: 'Property Name', key: 'name'},
@@ -25,8 +29,10 @@ function Page() {
     const [propertyData, setPropertyData] = React.useState<PropertyType[]>([]);
     const [filteredPropertyData, setFilteredPropertyData] = React.useState<any[]>([]);
     const [selectedProperty, setSelectedProperty] = React.useState<PropertyType>();
+    const [propertyIDFiles, setPropertyIDFiles] = React.useState<number>(-1);
     const [newPropertyProfile, setNewPropertyProfile] = React.useState<PropertyType>({} as PropertyType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
+    const [viewFiles, setViewFiles] = React.useState<boolean>(false);
 
     const selectProperty = (property: PropertyType) => {
         setSelectedProperty(property)
@@ -37,7 +43,8 @@ function Page() {
     }
 
     const viewPropertyFiles = (property: PropertyType) => {
-        console.log(property)
+        setPropertyIDFiles(property.id)
+        setViewFiles(true)
     }
 
     const submitNewProperty = () => {
@@ -72,7 +79,7 @@ function Page() {
                 parking_count: property.parking_count,
                 locker_count: property.locker_count,
                 condo_files: <ActionButton title={'View Files'} onClick={() => viewPropertyFiles(property)}/>,
-                edit: <ActionButton title={'Edit'} onClick={() => selectProperty(property)}/>
+                edit: <ActionIcon Icon={PencilSquareIcon} onClick={() => selectProperty(property)}/>
             }
         })
         setFilteredPropertyData(filteredData)
@@ -85,6 +92,7 @@ function Page() {
 
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
+            <PropertyFilesView viewFiles={viewFiles} setViewFiles={setViewFiles} propertyId={propertyIDFiles}/>
             <div className={"min-w-0 max-w-fit"}>
                 <DashboardPanel
                     title={'My Properties'}

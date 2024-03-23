@@ -61,6 +61,14 @@ export interface CondoUnitType {
     lockers: LockerType[];
 }
 
+export interface CondoFileType {
+    id: number;
+    name: string;
+    type: string;
+    src: string;
+    unit: {id: number, name: string};
+}
+
 // Other types
 export interface HeaderType {
     name: string;
