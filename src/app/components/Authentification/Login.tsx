@@ -45,18 +45,18 @@ const Login = () => {
                         if(res.data && res.data?.length != 0) {
                             console.log("setting user type: ", res.data[0].role)
                             localStorage.setItem("user_role", res.data[0].role)
+                            window.location.href = '/'
                         }
                         // This is a company user
                         else {
                             getCompanyProfile().then((res) => {
                                 console.log("Setting Company user")
                                 localStorage.setItem("user_role", UserType.COMPANY)
+                                window.location.href = '/'
                             })
                         }
-
                     })
                 }
-                window.location.href = '/'
             })
             .catch(console.error)
     }
