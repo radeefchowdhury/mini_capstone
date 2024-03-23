@@ -1,5 +1,5 @@
 import { render, act, screen, fireEvent } from '@testing-library/react';
-import ActionButton from '../app/components/Dashboard/ActionButton';
+import ActionButton from '@/app/components/dashboard/ActionButton';
 
 
 

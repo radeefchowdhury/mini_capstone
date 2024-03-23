@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import DashboardTable from '../app/components/Dashboard/DashboardTable';
+import DashboardTable from '@/app/components/dashboard/DashboardTable';
 
 describe('DashboardTable', () => {
 
