@@ -1,5 +1,4 @@
 import connection from "@/app/api/supabase/SupabaseContextProvider";
-import {log} from "node:util";
 
 const supabase = connection;
 
@@ -7,31 +6,45 @@ const supabase = connection;
 export const getPropertiesFromCompany = async (id: any) => {
     const {data, error} = await supabase
         .from('Property')
-        .select('*')
+        .select('*, units:CondoUnit(*, files:CondoFile(*))')
         .eq('company_id', id)
+        .order('name', {ascending: true})
     return {data, error}
 }
 
+export const getCondosFromProperty = async (id: any) => {
+    const {data, error} = await supabase
+        .from('CondoUnit')
+        .select('*')
+        .eq('property_id', id)
+        .order('name', {ascending: true})
+    return {data, error}
+
+}
 export const submitPropertyProfile = async (propertyProfile: any) => {
     supabase
         .from('Property')
         .insert([propertyProfile])
-        .then(res => {console.log(res)})
-    window.location.reload()
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
 }
 
-export const getCondoListFromPublicUser = async (id: any) => {
+export const getCondosFromOccupant = async (id: any) => {
     const {data, error} = await supabase
         .from('CondoUnit')
         .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(name, address)')
         .eq('occupied_by', id)
+        .order('name', {ascending: true})
+        .order('property_id', {ascending: true})
     return {data, error}
 }
 
-export const getCondoListFromCompany = async (id: any) => {
+export const getCondosFromCompany = async (id: any) => {
     const {data, error} = await supabase
         .from('CondoUnit')
-        .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(name, address), Occupant:UserProfile(first_name)')
+        .select('*, parking_spots:ParkingSpot(*), lockers:Locker(*), property:Property(name, address), occupant:UserProfile(first_name, last_name), files:CondoFile(*)')
         .eq('property.company_id', id)
     console.log(data)
     return {data, error}
@@ -50,8 +63,11 @@ export const submitCondoProfile = async (condoProfile: any) => {
     supabase
         .from('CondoUnit')
         .insert([condoProfile])
-        .then(res => {console.log(res)})
-    window.location.reload()
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
+
 }
 
 export const updateRegistrationKey = async (id: any, key: any) => {
@@ -59,8 +75,11 @@ export const updateRegistrationKey = async (id: any, key: any) => {
         .from('CondoUnit')
         .update({registration_key: key})
         .eq('id', id)
-        .then(res => {console.log(res)})
-    window.location.reload()
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
+
 }
 
 export const registerCondoUnitWithKey = async (user_id: any, key: any) => {
@@ -68,19 +87,10 @@ export const registerCondoUnitWithKey = async (user_id: any, key: any) => {
         .from('CondoUnit')
         .update({occupied_by: user_id})
         .eq('registration_key', key)
-        .then(res => {console.log(res)})
-    window.location.reload()
-}
-
-export const getFilesFromProperty = async (id: any) => {
-    // CondoFile(id, name, file, unit_id)
-    // CondoUnit(id, name, number, description, fee, size, registration_key, occupied_by, property_id)
-
-    const {data, error} = await supabase
-        .from('CondoFile')
-        .select('*, unit:CondoUnit(id, name)')
-        .eq('unit.property_id', id)
-    return {data, error}
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
 }
 
 export const getCondoIDFromName = async (name: any) => {
@@ -91,29 +101,6 @@ export const getCondoIDFromName = async (name: any) => {
     return {data, error}
 }
 
-export const uploadCondoFile = async (file: any, fileName: string) => {
-    await supabase
-        .storage
-        .from('condo_file_bucket')
-        .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: true
-        })
-        .catch(console.error)
-}
 
-export const createCondoFileInstance = async (file: any) => {
-    supabase
-        .from('CondoFile')
-        .insert([file])
-        .then(console.log)
-}
-export const getCondoFileURL = async (fileName: string) => {
-    const {data} = supabase
-        .storage
-        .from('condo_file_bucket')
-        .getPublicUrl(fileName)
 
-    return data.publicUrl
-}
 
