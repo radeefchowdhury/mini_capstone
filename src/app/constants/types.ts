@@ -21,6 +21,7 @@ export interface PropertyType {
     address: string;
     description: string;
     unit_count: number;
+    units?: CondoUnitType[];
     parking_count: number;
     locker_count: number;
     company_id: string;
@@ -46,7 +47,7 @@ export interface LockerType {
 }
 
 export interface CondoUnitType {
-    id: string;
+    id: number;
     name: string;
     number: number;
     description?: string;
@@ -54,6 +55,8 @@ export interface CondoUnitType {
     size: number;
     registration_key?: string;
     occupied_by?: string; // Foreign key to UserProfile
+    files?: CondoFileType[];
+    occupant?: UserProfileType;
     property_id: string; // Foreign key to Property
     property_name?: string;
     property: PropertyType;
