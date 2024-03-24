@@ -6,8 +6,10 @@ export const submitCompanyProfile = async (companyProfile: CompanyType) => {
     supabase
         .from('Company')
         .upsert([companyProfile])
-        .then(console.log)
-    window.location.reload()
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
 }
 
 export const getCompanyProfile = async ()  => {
