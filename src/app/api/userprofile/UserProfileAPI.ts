@@ -1,4 +1,4 @@
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 import {UserProfileType} from "@/app/constants/types";
 
 const supabase = connection;
@@ -11,14 +11,17 @@ export const submitUserProfile = async (userProfile:UserProfileType) => {
     supabase
         .from('UserProfile')
         .upsert([userProfile])
-        .then(console.log)
-    window.location.reload()
+        .then(res => {
+            console.log(res)
+            window.location.reload()
+        })
 }
 
-export const getUserProfile = async ()  => {
+export const getUserProfileById = async (id: string)  => {
     const {data, error} = await supabase
         .from('UserProfile')
         .select('*')
+        .eq('id', id)
     return {data, error}
 }
 
@@ -38,6 +41,5 @@ export const getProfilePictureURL = async (fileName: string)  => {
         .storage
         .from('profile_picture_bucket')
         .getPublicUrl(fileName)
-
     return data.publicUrl
 }

@@ -1,10 +1,10 @@
 import { render, act, screen } from '@testing-library/react';
 import Home from '../app/page'; // Adjust the import path as necessary
-import connection from "../app/api/supabase/supabase";
+import connection from "../app/api/supabase/SupabaseContextProvider";
 import userEvent from '@testing-library/user-event';
 
 // First, mock the necessary parts of Supabase
-jest.mock("../app/api/supabase/supabase", () => ({
+jest.mock("../app/api/supabase/SupabaseContextProvider", () => ({
     auth: {
         signOut: jest.fn(() => Promise.resolve()), // Simulate a successful sign-out
         getSession: jest.fn(() => Promise.resolve({ // Simulate fetching user session

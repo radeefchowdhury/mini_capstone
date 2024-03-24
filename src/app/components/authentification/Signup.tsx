@@ -1,6 +1,6 @@
 "use client";
 import {useState} from 'react';
-import connection from "@/app/api/supabase/supabase";
+import connection from "@/app/api/supabase/SupabaseContextProvider";
 
 const SignUp = () => {
     const supabase = connection;

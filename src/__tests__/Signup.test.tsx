@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import Home from '../app/signup/page'; // Adjust the import path as necessary
-import SignUp from '../app/components/Authentification/SignUp';
+import SignUp from '@/app/components/authentification/SignUp';
 import { act } from 'react-dom/test-utils';
 
 // Assuming there's a mock function or additional setup needed for testing, include it here
 // For this example, we'll assume no additional mocks are needed outside of what's provided in the components
 
-jest.mock("../app/api/supabase/supabase", () => ({
+jest.mock("../app/api/supabase/SupabaseContextProvider", () => ({
     auth: {
         signUp: jest.fn(() => Promise.resolve({
             user: {}, // Mock user object or whatever the signUp function is supposed to return
@@ -104,7 +104,7 @@ describe('Signup Page', () => {
 
 
     it('submits the form successfully when passwords match', async () => {
-        const signUpSpy = jest.spyOn(require("../app/api/supabase/supabase").auth, 'signUp');
+        const signUpSpy = jest.spyOn(require("../app/api/supabase/SupabaseContextProvider").auth, 'signUp');
 
         await userEvent.type(screen.getByLabelText(/First Name/i), 'Test'); // Adjust according to actual label text
         await userEvent.type(screen.getByLabelText(/Last Name/i), 'Test');
