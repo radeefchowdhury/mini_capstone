@@ -29,10 +29,11 @@ function Page() {
     const [propertyData, setPropertyData] = React.useState<PropertyType[]>([]);
     const [filteredPropertyData, setFilteredPropertyData] = React.useState<any[]>([]);
     const [selectedProperty, setSelectedProperty] = React.useState<PropertyType>();
-    const [propertyIDFiles, setPropertyIDFiles] = React.useState<number>(-1);
     const [newPropertyProfile, setNewPropertyProfile] = React.useState<PropertyType>({} as PropertyType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
     const [viewFiles, setViewFiles] = React.useState<boolean>(false);
+    const [selectedPropertyFiles, setSelectedPropertyFiles] = React.useState<PropertyType>({} as PropertyType);
+
 
     const selectProperty = (property: PropertyType) => {
         setSelectedProperty(property)
@@ -43,7 +44,7 @@ function Page() {
     }
 
     const viewPropertyFiles = (property: PropertyType) => {
-        setPropertyIDFiles(property.id)
+        setSelectedPropertyFiles(property)
         setViewFiles(true)
     }
 
@@ -71,6 +72,12 @@ function Page() {
     useEffect(() => {
         if(propertyData.length == 0) return;
         let filteredData = propertyData.map((property) => {
+            // property has a list of units, each unit has a list of files
+            // I need to get the count of all files in all condos
+            // make sure that it is TS compliant
+            const fileCount = property.units?.reduce((acc: number, unit) => {
+                return acc + (unit.files ? unit.files.length : 0);
+            }, 0) || 0;
             return {
                 id: property.id,
                 name: property.name,
@@ -78,7 +85,7 @@ function Page() {
                 unit_count: property.unit_count,
                 parking_count: property.parking_count,
                 locker_count: property.locker_count,
-                condo_files: <ActionButton title={'View Files'} onClick={() => viewPropertyFiles(property)}/>,
+                condo_files: <ActionButton title={"View Files (" + fileCount + ")"} onClick={() => viewPropertyFiles(property)}/>,
                 edit: <ActionIcon Icon={PencilSquareIcon} onClick={() => selectProperty(property)}/>
             }
         })
@@ -92,7 +99,7 @@ function Page() {
 
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
-            <PropertyFilesView viewFiles={viewFiles} setViewFiles={setViewFiles} propertyId={propertyIDFiles}/>
+            <PropertyFilesView isVisible={viewFiles} setIsVisible={setViewFiles} property={selectedPropertyFiles}/>
             <div className={"min-w-0 max-w-fit"}>
                 <DashboardPanel
                     title={'My Properties'}
