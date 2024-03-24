@@ -2,7 +2,7 @@
 
 import {useState} from "react";
 import connection from "@/app/api/supabase/SupabaseContextProvider";
-import {getUserProfile} from "@/app/api/userprofile/UserProfileAPI";
+import {getUserProfileById} from "@/app/api/userprofile/UserProfileAPI";
 import {getCompanyProfile} from "@/app/api/company/CompanyAPI";
 import {UserType} from "@/app/constants/types";
 
@@ -36,7 +36,7 @@ const Login = () => {
                 else {
                     console.log("setting user id: ", res.data.user.id)
                     localStorage.setItem("user_id", res.data.user.id)
-                    getUserProfile().then((res) => {
+                    getUserProfileById().then((res) => {
                         if (res.error) {
                             setError(res.error.message)
                             return
