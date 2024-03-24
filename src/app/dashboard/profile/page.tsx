@@ -4,7 +4,7 @@ import React, {useEffect} from 'react';
 import {CompanyType, UserProfileType} from "@/app/constants/types";
 import {
     getProfilePictureURL,
-    getUserProfile, getUserSession,
+    getUserProfileById, getUserSession,
     submitUserProfile,
     uploadProfilePicture
 } from "@/app/api/userprofile/UserProfileAPI";
@@ -48,9 +48,11 @@ function Page() {
 
     const fetchUserData = async () => {
         const userSession = await getUserSession()
-        if (!userSession) window.location.href = '/login'
-
-        const {data, error} = await getUserProfile()
+        if (!userSession) {
+            window.location.href = '/login'
+            return
+        }
+        const {data, error} = await getUserProfileById(userSession.user.id)
         if (error || !data){
             console.error(error?.message || 'Error fetching user profile')
             return
