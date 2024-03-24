@@ -83,7 +83,6 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
             uploadCondoFile(file, selectedFile.name).catch(console.error).then(() => {
                 getCondoFileURL(selectedFile.name).catch(console.error).then((data) => {
                     if(data) file_src = data
-                    console.log(file_src)
                 }).then(() => {
                     upsertCondoFile(selectedFile, file_src)
                 })
