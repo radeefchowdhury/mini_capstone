@@ -22,6 +22,8 @@ export interface PropertyType {
     description: string;
     unit_count: number;
     units?: CondoUnitType[];
+    parking_spots?: ParkingSpotType[];
+    lockers?: LockerType[];
     parking_count: number;
     locker_count: number;
     company_id: string;
