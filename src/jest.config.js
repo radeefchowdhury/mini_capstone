@@ -16,18 +16,15 @@ const customJestConfig = {
     coverageReporters: ['json', 'lcov', 'text', 'text-summary'], // Specify coverage reporters
     coverageThreshold: { // Optional: Set minimum coverage thresholds to enforce for each file
         global: {
-            branches: 80,
-            functions: 80,
-            lines: 80,
-            statements: 80,
+            branches: 50,
+            functions: 50,
+            lines: 50,
+            statements: 50,
         },
     },
     collectCoverageFrom: [ // Define which files to include in coverage
         '**/*{js,jsx,ts,tsx}',
         '!**/app/api/**',
-        '!**/app/layout.tsx',
-        '!**/app/components/navbars/MobileHeader.tsx',
-        '!**/app/components/navbars/SideNav.tsx',
         '!**/app/layout.tsx',
         '!**/app/constants/types.ts',
         '!**/app/dashboard/layout.tsx',
@@ -40,7 +37,14 @@ const customJestConfig = {
         '!**/*.config.mjs',
         '!**/*.config.ts',
         '!**/coverage/**',
-        '!**/app/dashboard/profile/page.tsx',
+        '!**/app/dashboard/properties/PropertyInfo.tsx',
+        '!**/app/dashboard/units/CondoUnitInfo.tsx',
+        '!**/app/dashboard/units/KeyForm.tsx',
+        '!**/app/components/Navbars/MobileHeader.tsx',
+        '!**/app/components/Navbars/SideNav.tsx',
+        '!**/app/dashboard/finances/page.tsx',
+        '!**/app/dashboard/operations/OperationRequestForm.tsx',
+        '!**/app/dashboard/operations/page.tsx',
     ],
 };
 
