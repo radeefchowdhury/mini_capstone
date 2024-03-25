@@ -77,3 +77,24 @@ export interface HeaderType {
     name: string;
     key: string;
 }
+
+export interface RequestType {
+    id: number;
+    unit_id: number;
+    condo_name?: string;
+    unit?: {name: string};
+    type: string;
+    date: string;
+    amount: number;
+    status: string;
+    assigned_to: string;
+}
+
+export interface OperationRequestType {
+    unit_id: number;
+    request_type: string;
+    amount: number;
+    status: string;
+    assigned_employee: string;
+
+}
