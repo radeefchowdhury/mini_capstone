@@ -60,3 +60,4 @@ export const getCondoFilesFromCondoId = async (id: any) => {
         .eq('unit_id', id)
     return {data, error}
 }
+

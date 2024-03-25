@@ -18,3 +18,12 @@ export const getCompanyProfile = async ()  => {
         .select('*')
     return {data, error}
 }
+
+export const getRequestsFromCompany = async (id: any) => {
+    const {data, error} = await supabase
+        .from('Request')
+        .select('*, condo:CondoUnit(name, property_id, property:Property(name, address))')
+        .eq('condo.property.company_id', id)
+
+    return {data, error}
+}
