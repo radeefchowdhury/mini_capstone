@@ -36,7 +36,7 @@ const Login = () => {
                 else {
                     console.log("setting user id: ", res.data.user.id)
                     localStorage.setItem("user_id", res.data.user.id)
-                    getUserProfileById().then((res) => {
+                    getUserProfileById(res.data.user.id).then((res) => {
                         if (res.error) {
                             setError(res.error.message)
                             return
