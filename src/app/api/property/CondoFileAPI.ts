@@ -14,7 +14,7 @@ export const uploadCondoFile = async (file: any, fileName: string) => {
 }
 
 export const submitCondoFile = async (file: any) => {
-    console.log(file)
+    if(file.id === undefined) delete file.id
     supabase
         .from('CondoFile')
         .upsert([file])
