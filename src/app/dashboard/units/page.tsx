@@ -7,15 +7,19 @@ import {
     getPropertyIdByName, registerCondoUnitWithKey,
     submitCondoProfile, updateRegistrationKey
 } from "@/app/api/property/PropertyAPI";
-import {CondoFileType, CondoUnitType, PropertyType, UserType} from "@/app/constants/types";
+import {CondoUnitType, UserType} from "@/app/constants/types";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import CondoUnitInfo from "@/app/dashboard/units/CondoUnitInfo";
 import ActionButton from "@/app/components/dashboard/ActionButton";
 import KeyForm from "@/app/dashboard/units/KeyForm";
 import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {PencilSquareIcon} from "@heroicons/react/24/outline";
-import PropertyFilesView from "@/app/dashboard/properties/PropertyFilesView";
 import UnitsFilesView from "@/app/dashboard/units/UnitsFilesView";
+import ParkingLockerView from "@/app/components/dashboard/ParkingLockerView";
+import {
+    getParkingLockerListFromProperty as getLockerPropertyListFromProperty,
+    getParkingLockerListFromProperty
+} from "@/app/api/property/ParkingLockerAPI";
 
 const condoTableHeaders = [
     {name: 'Condo Name', key: 'name'},
@@ -24,8 +28,8 @@ const condoTableHeaders = [
     {name: 'Condo Number', key: 'number'},
     {name: 'Fee ($)', key: 'fee'},
     {name: 'Size (m²)', key: 'size'},
-    {name: 'Parking Spots', key: 'parking_spots_length'},
-    {name: 'Lockers', key: 'lockers_length'},
+    {name: 'Parking Spots', key: 'view_parking'},
+    {name: 'Lockers', key: 'view_lockers'},
     {name: 'View Files', key: 'view_files'},
 ]
 
@@ -36,8 +40,8 @@ const condoTableHeadersForCompany = [
     {name: 'Condo Number', key: 'number'},
     {name: 'Fee ($)', key: 'fee'},
     {name: 'Size (m²)', key: 'size'},
-    {name: 'Parking Spots', key: 'parking_spots_length'},
-    {name: 'Lockers', key: 'lockers_length'},
+    {name: 'Parking Spots', key: 'view_parking'},
+    {name: 'Lockers', key: 'view_lockers'},
     {name: 'View Files', key: 'view_files'},
     {name: 'Registration Key', key: 'registration_key'},
     {name: 'Occupied By', key: 'occupant'},
@@ -54,9 +58,13 @@ function Page() {
     const [newCondoProfile, setNewCondoProfile] = React.useState<CondoUnitType>({} as CondoUnitType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
     const [registrationKey, setRegistrationKey] = React.useState<string>("");
+
     const [viewFiles, setViewFiles] = React.useState<boolean>(false);
-    const [selectedCondoFiles, setSelectedCondoFiles] = React.useState<CondoUnitType>({} as CondoUnitType);
-    const [tooltipText, setTooltipText] = React.useState<string>('Click to copy key');
+    const [selectedCondoView, setSelectedCondoView] = React.useState<CondoUnitType>({} as CondoUnitType);
+
+    const [viewParkingLocker, setViewParkingLocker] = React.useState<boolean>(false);
+    const [parkingLockerView, setParkingLockerView] = React.useState<'PARKING' | 'LOCKER'>('PARKING');
+    const [parkingLockerList, setParkingLockerList] = React.useState<any[]>([]);
 
     const registerNewUnit = () => {
         setFormAction('CREATE')
@@ -70,9 +78,6 @@ function Page() {
         });
     };
 
-    useEffect(() => {
-        console.log(tooltipText)
-    }, [tooltipText]);
 
     const generateRegistrationKey = async (unit_id: any) => {
         const key = generateUUID();
@@ -109,8 +114,19 @@ function Page() {
     }
 
     const viewCondoFiles = (unit: CondoUnitType) => {
-        setSelectedCondoFiles(unit)
+        setSelectedCondoView(unit)
         setViewFiles(true)
+    }
+
+    const viewParkingLockerOnClick = async (unit: CondoUnitType, type: 'PARKING' | 'LOCKER') => {
+        setSelectedCondoView(unit)
+        setParkingLockerView(type)
+        setViewParkingLocker(true)
+        if(userType == UserType.COMPANY){
+            const {data, error} = await getParkingLockerListFromProperty(unit.property_id, type)
+            setParkingLockerList(data || [])
+        }
+        else setParkingLockerList(type === 'PARKING' ? unit.parking_spots : unit.lockers)
     }
 
     const fetchCondoData = async () => {
@@ -146,7 +162,6 @@ function Page() {
         let filteredData;
         if(userType === "COMPANY"){
             filteredData = condoData.map((unit) => {
-                console.log(unit)
                 return {
                     id: unit.id,
                     name: unit.name,
@@ -156,20 +171,22 @@ function Page() {
                     description: unit.description,
                     fee: unit.fee,
                     size: unit.size,
-                    parking_spots_length: unit.parking_spots.length,
-                    lockers_length: unit.lockers.length,
+                    view_parking: <ActionButton title={`View Parking`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                    view_lockers: <ActionButton title={`View Lockers`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
                     view_files: <ActionButton title={`View Files (${unit.files ? unit.files.length : 0})`} onClick={() => viewCondoFiles(unit)}/>,
                     registration_key:
                         <button
                             className={`${unit.registration_key ? 
-                                "flex items-center justify-center py-1 px-3 mx-auto bg-blue-500 text-white text-sm rounded-md" : 
+                                "flex items-center justify-center py-1 px-3 mx-auto bg-blue-500 hover:bg-blue-700 text-white text-sm rounded-md" : 
                                 "flex items-center justify-center py-1 px-3 mx-auto bg-gray-300 text-gray-500 text-sm rounded-md cursor-default"}`}
                             onClick={() => navigator.clipboard.writeText(unit.registration_key as string)}
                             disabled={!unit.registration_key}
                             title={unit.registration_key}>
                             {unit.registration_key ? "Copy Key" : "No Key"}
                         </button>,
-                    occupant: unit.occupant ? unit.occupant?.first_name + " " + unit.occupant?.last_name : "unoccupied",
+                    occupant: unit.occupant ?
+                        <div>{unit.occupant.first_name + " " + unit.occupant.last_name}</div> :
+                        <div className={"text-stone-600"}>Unoccupied</div>,
                     actions: (
                         <div className={"flex flex-row gap-4 py-2 px-3"}>
                             <ActionButton title={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
@@ -189,8 +206,8 @@ function Page() {
                 description: unit.description,
                 fee: unit.fee,
                 size: unit.size,
-                parking_spots_length: unit.parking_spots?.length,
-                lockers_length: unit.lockers?.length,
+                view_parking: <ActionButton title={`View Parking (${unit.parking_spots.length})`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                view_lockers: <ActionButton title={`View Lockers (${unit.lockers ? unit.lockers.length : 0})`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
                 view_files: <ActionButton title={'View Files'} onClick={() => viewCondoFiles(unit)}/>,
                 registration_key: unit.registration_key,
             }
@@ -201,7 +218,20 @@ function Page() {
 
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
-            <UnitsFilesView isVisible={viewFiles} setIsVisible={setViewFiles} condo={selectedCondoFiles}/>
+            <UnitsFilesView
+                isVisible={viewFiles}
+                setIsVisible={setViewFiles}
+                condo={selectedCondoView}
+            />
+            <ParkingLockerView
+                type={parkingLockerView}
+                isVisible={viewParkingLocker}
+                selectedItem={selectedCondoView}
+                setIsVisible={setViewParkingLocker}
+                items={parkingLockerList}
+                view={userType == UserType.COMPANY ? 'COMPANY' : 'PUBLIC'}
+                from={'CONDO'}
+            />
             <div className={"min-w-0 max-w-fit"}>
                 {(userType == UserType.RENTER || userType == UserType.OWNER) &&
                     <DashboardPanel
