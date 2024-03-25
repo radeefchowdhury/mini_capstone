@@ -34,9 +34,7 @@ const navItems = [
 ]
 
 export default function SideNav(props: SideNavProps) {
-    // Destructure props
     const { sidebarOpen, setSidebarOpen, userType} = props;
-    // Define state for sidebar expansion
     const [sidebarExpanded, setSidebarExpanded] = useState<boolean>(false);
 
     // Create a reference to the sidebar element

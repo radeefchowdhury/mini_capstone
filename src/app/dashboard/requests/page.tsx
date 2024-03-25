@@ -37,7 +37,6 @@ function Page(){
 
 
     const fetchRequestData = async () => {
-        console.log(userId)
         const {data: requestData, error:requestError} = await getRequestDataFromOwner(userId);
         if(requestError){
             console.log(requestError)
@@ -57,9 +56,8 @@ function Page(){
         if(requestData.length === 0) return;
         let filteredData;
         filteredData = requestData.map((request) => {
-            console.log(request)
             return{
-                condo_name: request.unit?.name,
+                condo_name: request.condo?.name,
                 request_type: request.type,
                 date_submitted: request.date,
                 amount: request.amount || 'Unset',
@@ -67,7 +65,6 @@ function Page(){
             }
         }); 
         setFilteredRequestData(filteredData);
-        console.log(filteredData);
     }, [requestData]);
 
     const submitNewRequest = async () => {

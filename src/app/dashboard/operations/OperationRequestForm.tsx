@@ -1,70 +1,89 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import {EmployeeType, RequestType, RequestTypeOptions, RequestTypeToRole} from "@/app/constants/types";
+import {getEmployeesFromCompany} from "@/app/api/request/RequestAPI";
 
 interface RequestFormProps {
-    request_type: string;
-    date_submitted: string;
-    amount: number;
-    assigned_to: string;
-    status: string;
-
-
-    setRequestType: (request_type: string) => void;
-    setDateSubmitted: (date_submitted: string) => void;
-    setAmount: (amount: number) => void;
-    setAssignedTo: (assigned_to: string) => void;
-    setStatus: (status: string) => void;
-    
+    company_id: string;
+    request: RequestType;
+    setRequest: (request: RequestType) => void;
 }
 
-function RequestForm(props: RequestFormProps) {
-    const handleSubmit = () => {
-    };
+function OperationRequestForm(props: RequestFormProps) {
+    const {request, setRequest, company_id} = props;
+    const [employees, setEmployees] = React.useState<EmployeeType[]>([]);
+
+    useEffect(() => {
+        // Fetch employees
+        if(!company_id || !request.type) return;
+        getEmployeesFromCompany(company_id).then(({data, error}) => {
+            if(error){
+                console.log(error)
+                return
+            }
+            const requiredRole = RequestTypeToRole[request.type as keyof typeof RequestTypeToRole];
+            let filteredEmployees = data?.filter((employee: EmployeeType) => employee.role === requiredRole) || [];
+            setEmployees(filteredEmployees);
+        })
+        console.log(employees)
+    }, [request, company_id]);
 
     return (
         <div className={"flex flex-col gap-2"}>
             <label htmlFor={"request_type"}>Request Type</label>
-            <h2>{props.request_type}</h2>
+            <input
+                type={"number"}
+                id={"type"}
+                value={request.type}
+                placeholder={request.type}
+                disabled
+                className={"border border-gray-300 rounded-md p-2"}
+            />
 
             <label htmlFor={"date_submitted"}>Date Submitted</label>
-            <h2>{props.date_submitted}</h2>
+            <input
+                type={"number"}
+                id={"date_submitted"}
+                value={request.date}
+                placeholder={request.date}
+                disabled
+                className={"border border-gray-300 rounded-md p-2"}
+            />
+
+            <label htmlFor={"description"}>Description</label>
+            <textarea
+                className={"border border-gray-300 rounded-md p-2 text-gray-400"}
+                id={"description"}
+                value={request.description}
+                disabled
+                onChange={(e) => setRequest({...request, description: e.target.value})}
+            />
 
             <label htmlFor={"amount"}>Amount</label>
             <input
                 type={"number"}
                 id={"amount"}
-                value={props.amount}
-                onChange={(e) => props.setAmount(Number(e.target.value))}
+                value={request.amount || 0}
+                onChange={(e) => setRequest({...request, amount: parseFloat(e.target.value)})}
+                placeholder={request.amount?.toString()}
                 className={"border border-gray-300 rounded-md p-2"}
             />
-
 
 
             <label htmlFor={"assigned_to"}>Assign To</label>
             <select
                 id={"type"}
-                value={props.assigned_to}
-                onChange={(e) => props.setAssignedTo(e.target.value)}
+                value={request.assigned_to || ""}
+                onChange={(e) => setRequest({...request, assigned_to: e.target.value})}
                 className={"border border-gray-300 rounded-md p-2"}
-                defaultValue={""}
             >
-                <option value={""} disabled>Select Type</option>
-                
+                <option value={""} disabled>Select Employee</option>
+                {employees.map((employee) => (
+                    <option key={employee.id} value={employee.id}>{employee.name}</option>
+                ))}
             </select>
-           
-            <label htmlFor={"description"}>Description</label>
-            <input
-                type={"text"}
-                id={"description"}
-                value={props.description}
-                onChange={(e) => props.setDescription(e.target.value)}
-                className={"border border-gray-300 rounded-md p-2"}
-            />
-
-            
-
 
         </div>
     );
 }
 
-export default RequestForm;
+export default OperationRequestForm;

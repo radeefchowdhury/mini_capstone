@@ -22,8 +22,9 @@ export const getCompanyProfile = async ()  => {
 export const getRequestsFromCompany = async (id: any) => {
     const {data, error} = await supabase
         .from('Request')
-        .select('*, condo:CondoUnit(name, property_id, property:Property(name, address))')
+        .select('*, condo:CondoUnit(name, property_id, property:Property(name, address)), employee:Employee!public_Request_assigned_to_fkey(id, name)')
         .eq('condo.property.company_id', id)
+    console.log(data)
 
     return {data, error}
 }

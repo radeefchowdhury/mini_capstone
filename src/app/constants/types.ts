@@ -82,29 +82,71 @@ export interface HeaderType {
 
 export interface RequestType {
     id: number;
+    description: string;
     unit_id: number;
     condo_name?: string;
-    unit?: {name: string};
+    condo?: {name: string};
     type: string;
     date: string;
     amount: number;
     status: RequestStatus;
     assigned_to: string;
+    employee?: {id: string, name: string};
 }
 
 export enum RequestStatus {
     PENDING = "PENDING",
-    APPROVED = "APPROVED",
-    IN_PROGRESS = "IN PROGRESS",
+    APPROVED = "APPROVED", // When a request amount is set, but not yet assigned
+    ASSIGNED = "ASSIGNED", // When a request is assigned to an employee, but amount is not set
+    IN_PROGRESS = "IN PROGRESS", // When a request is both assigned and amount is set
     DENIED = "DENIED",
     COMPLETED = "COMPLETED"
 }
 
+export enum RequestTypeOptions {
+    MAINTENANCE = "MAINTENANCE",
+    TESTING = "TESTING",
+    REPAIR = "REPAIR",
+    INSPECTION = "INSPECTION",
+    NEW_FACILITY = "NEW FACILITY",
+}
+
+export interface EmployeeType {
+    id: number,
+    name: string;
+    role: EmployeeRole;
+    email: string;
+    phone_number: number;
+    company_id: string;
+}
+
+export enum EmployeeRole {
+    ADMIN = "ADMIN",
+    TECHNICIAN = "TECHNICIAN",
+    MANAGER = "MANAGER",
+    INSPECTOR = "INSPECTOR",
+    INSTALLER = "INSTALLER",
+    TESTER = "TESTER",
+    SUPERVISOR = "SUPERVISOR",
+    FINANCE = "FINANCE",
+}
+
+// Depending on the RequestTypeOption, a request can only be assigned to an employee with a corresponding role
+export const RequestTypeToRole = {
+    [RequestTypeOptions.MAINTENANCE]: EmployeeRole.TECHNICIAN,
+    [RequestTypeOptions.TESTING]: EmployeeRole.TESTER,
+    [RequestTypeOptions.REPAIR]: EmployeeRole.TECHNICIAN,
+    [RequestTypeOptions.INSPECTION]: EmployeeRole.INSPECTOR,
+    [RequestTypeOptions.NEW_FACILITY]: EmployeeRole.INSTALLER,
+}
+
 export interface OperationRequestType {
+    id: number;
+    condo_name: string;
+    date_submitted: string;
     unit_id: number;
     request_type: string;
     amount: number;
     status: string;
     assigned_employee: string;
-
 }
