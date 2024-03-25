@@ -88,8 +88,16 @@ export interface RequestType {
     type: string;
     date: string;
     amount: number;
-    status: string;
+    status: RequestStatus;
     assigned_to: string;
+}
+
+export enum RequestStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    IN_PROGRESS = "IN PROGRESS",
+    DENIED = "DENIED",
+    COMPLETED = "COMPLETED"
 }
 
 export interface OperationRequestType {
