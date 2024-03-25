@@ -158,7 +158,6 @@ function Page() {
     }, [userId]);
 
     useEffect(() => {
-        console.log(condoData)
         if(condoData.length == 0) return;
         let filteredData;
         if(userType === "COMPANY"){
