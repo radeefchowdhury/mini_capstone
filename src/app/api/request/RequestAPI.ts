@@ -8,8 +8,7 @@ export const getRequestDataFromOwner = async (id: any) => {
         .from('Request')
         .select('*, unit:CondoUnit(name)')
         .eq('user_id', id)
-        .order('date', {ascending: true})
-    console.log(data)
+        .order('date', {ascending: false})
     return {data, error}
 }
 

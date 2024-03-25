@@ -49,10 +49,6 @@ function RequestForm(props: RequestFormProps) {
                 onChange={(e) => props.setDescription(e.target.value)}
                 className={"border border-gray-300 rounded-md p-2 min-w-0"}
             />
-
-            
-
-
         </div>
     );
 }
