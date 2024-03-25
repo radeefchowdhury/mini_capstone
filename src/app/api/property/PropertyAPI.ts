@@ -6,9 +6,10 @@ const supabase = connection;
 export const getPropertiesFromCompany = async (id: any) => {
     const {data, error} = await supabase
         .from('Property')
-        .select('*, units:CondoUnit(*, files:CondoFile(*))')
+        .select('*, units:CondoUnit(*, files:CondoFile(*)), parking_spots:ParkingSpot(*), lockers:Locker(*)')
         .eq('company_id', id)
         .order('name', {ascending: true})
+
     return {data, error}
 }
 
