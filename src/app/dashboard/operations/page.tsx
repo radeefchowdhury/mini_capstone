@@ -1,46 +1,39 @@
 
 "use client"
 import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
-import React, { use, useEffect, useState } from "react";
-import {RequestType} from "@/app/constants/types";
-import { getRequestDataFromCondoName, getRequestDataFromOwner, submitRequest } from "@/app/api/request/RequestAPI";
+import React, {useEffect} from "react";
+import {RequestStatus, RequestType} from "@/app/constants/types";
+import {submitRequest} from "@/app/api/request/RequestAPI";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
-import { getCondoIDFromName, getCondosFromCompany } from "@/app/api/property/PropertyAPI";
-import { getRequestsFromCompany } from "@/app/api/company/CompanyAPI";
+import {getRequestsFromCompany} from "@/app/api/company/CompanyAPI";
 import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {PencilSquareIcon} from "@heroicons/react/24/outline";
+import OperationRequestForm from "@/app/dashboard/operations/OperationRequestForm";
+import ActionButton from "@/app/components/dashboard/ActionButton";
 
 
 const operationHeaders = [
-  {name: 'Request Type', key: 'request_type'},
-  {name: 'Date Submitted', key: 'date_submitted'},
-  {name: 'Amount', key: 'amount'},
-  {name: 'Status', key: 'status'},
-  {name: 'Assigned To', key: 'assigned_to'},
-  {name: 'Edit', key: 'editbutton'}
+    {name: 'Condo Name', key: 'condo_name'},
+    {name: 'Request Type', key: 'request_type'},
+    {name: 'Date Submitted', key: 'date_submitted'},
+    {name: 'Amount', key: 'amount'},
+    {name: 'Status', key: 'status'},
+    {name: 'Assigned To', key: 'assigned_to'},
+    {name: 'Actions', key: 'actions'}
 ]
 
-
 function Page(){
-
     const [operationRequestData, setOperationRequestData] = React.useState<RequestType[]>([]);
+    const [editingRequest, setEditingRequest] = React.useState<boolean>();
     const [filteredRequestData, setFilteredRequestData] = React.useState<any[]>([]);
-    const [newRequest, setNewRequest] = React.useState<RequestType>({} as RequestType);
+    const [selectedRequest, setSelectedRequest] = React.useState<RequestType>({} as RequestType);
     const [userId, setUserId] = React.useState<string>();
-    const [showRequestForm, setShowRequestForm] = useState(false);
-    const [newRequestData, setNewRequestData] = React.useState<RequestType[]>([]);
-    const [newCondoName, setNewCondoName] = React.useState<string>("");
-    const [newType, setNewType] = React.useState<string>("");
-    const [newDescription, setNewDescription] = React.useState<string>("");
-
-
 
     useEffect(() => {
         setUserId(localStorage.getItem('user_id') as string);
     }, []);
 
-
-    const fetchOperationRequesData = async () => {
+    const fetchOperationRequestData = async () => {
       console.log(userId)
         const {data, error} = await getRequestsFromCompany(userId);
         if(error){
@@ -51,49 +44,96 @@ function Page(){
        if(data) setOperationRequestData(data)
     }
 
-    const onEdit = async() =>{
-      console.log("Edit");
-    
+    const onEdit = async(request: RequestType) =>{
+        setEditingRequest(true);
+        setSelectedRequest(request);
+    }
+
+    const submitEdit = async() => {
+        if(!selectedRequest) return;
+        // Set new status
+        let newStatus: RequestStatus = selectedRequest.status;
+        if(!selectedRequest.assigned_to && selectedRequest.amount)
+            newStatus = RequestStatus.APPROVED;
+        if(selectedRequest.assigned_to && !selectedRequest.amount)
+            newStatus = RequestStatus.ASSIGNED;
+        if(selectedRequest.assigned_to && selectedRequest.amount)
+            newStatus = RequestStatus.IN_PROGRESS;
+        const updatedRequest = {...selectedRequest, status: newStatus};
+        delete updatedRequest.condo;
+        delete updatedRequest.employee
+        await submitRequest(updatedRequest).then(res => {
+            console.log(res)
+            window.location.reload();
+        })
+    }
+
+    const completeRequest = async(request: RequestType) => {
+        const updatedRequest = {...request, status: RequestStatus.COMPLETED};
+        delete updatedRequest.condo;
+        delete updatedRequest.employee
+        await submitRequest(updatedRequest).then(res => {
+            window.location.reload();
+        })
     }
 
     useEffect(() => {
-      if(userId) fetchOperationRequesData().catch(console.error);
-  }, [userId]);
+        if(userId) fetchOperationRequestData().catch(console.error);
+    }, [userId]);
 
+    useEffect(() => {
+        if (operationRequestData.length === 0) return;
+        let filteredData;
 
-
-  useEffect(() => {
-    if (operationRequestData.length === 0) return;
-    let filteredData;
-
-    filteredData = operationRequestData.map((operationRequest) => {
-      return {
-        request_type: operationRequest.type,
-        date_submitted: operationRequest.date,
-        amount: operationRequest.amount,
-        status: operationRequest.status,
-        assigned_to: operationRequest.assigned_to,
-        edit: <ActionIcon Icon={PencilSquareIcon} onClick={onEdit} />,
-      };
-    });
-    setFilteredRequestData(filteredData);
-    console.log(filteredData);
-}, [operationRequestData]);
+        filteredData = operationRequestData.map((operationRequest) => {
+        return {
+            id: operationRequest.id,
+            condo_name: operationRequest.condo?.name,
+            request_type: operationRequest.type,
+            date_submitted: operationRequest.date,
+            amount: operationRequest.amount ? operationRequest.amount : 'Unset',
+            status: operationRequest.status,
+            assigned_to: operationRequest.assigned_to ? (operationRequest.employee?.name) : 'Unassigned',
+            actions:
+            <div className={"flex flex-row gap-3 px-2"}>
+                <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)} />
+                <ActionButton title={'Complete'} onClick={() => completeRequest(operationRequest)} />
+            </div>
+            }
+        });
+        // sort by id in descending order
+        filteredData.sort((a, b) => b.id - a.id);
+        setFilteredRequestData(filteredData);
+        console.log(filteredData);
+    }, [operationRequestData]);
 
 
 
     
     return (
-      <div>
-      <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
-        <DashboardPanel
-          title={'Operation Requests'}
-          children={<DashboardTable items={filteredRequestData} headers={operationHeaders} />}
-          onClick={() => setShowRequestForm(true)}
-        />
-      </div>
-      </div>
-      );
-      
+        <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
+            <div className={`min-w-0 ${editingRequest ? 'max-w-full' : 'max-w-fit'} `}>
+                <DashboardPanel
+                    title={'Operation Requests'}
+                    children={<DashboardTable items={filteredRequestData} headers={operationHeaders}/>}
+                />
+            </div>
+            {editingRequest &&
+            <div className={"min-w-[370px]"}>
+                <DashboardPanel
+                    title={"Edit Request"}
+                    children={<OperationRequestForm
+                        company_id={userId as string}
+                        request={selectedRequest}
+                        setRequest={setSelectedRequest}
+                    />}
+                    buttonTitle={'Submit'}
+                    onClick={() => submitEdit()}
+                />
+            </div>}
+        </div>
+    );
+
 }
+
 export default Page;

@@ -57,7 +57,7 @@ function Page(){
         let filteredData;
         filteredData = requestData.map((request) => {
             return{
-                condo_name: request.unit?.name,
+                condo_name: request.condo?.name,
                 request_type: request.type,
                 date_submitted: request.date,
                 amount: request.amount || 'Unset',
