@@ -79,3 +79,32 @@ export interface HeaderType {
     name: string;
     key: string;
 }
+
+export interface RequestType {
+    id: number;
+    unit_id: number;
+    condo_name?: string;
+    unit?: {name: string};
+    type: string;
+    date: string;
+    amount: number;
+    status: RequestStatus;
+    assigned_to: string;
+}
+
+export enum RequestStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    IN_PROGRESS = "IN PROGRESS",
+    DENIED = "DENIED",
+    COMPLETED = "COMPLETED"
+}
+
+export interface OperationRequestType {
+    unit_id: number;
+    request_type: string;
+    amount: number;
+    status: string;
+    assigned_employee: string;
+
+}
