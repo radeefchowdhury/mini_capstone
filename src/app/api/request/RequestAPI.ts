@@ -14,12 +14,11 @@ export const getRequestDataFromOwner = async (id: any) => {
 }
 
 export const submitRequest = async (request: any) => {
-    supabase
+    await supabase
         .from('Request')
         .upsert([request])
         .then(res => {
             console.log(res)
-            window.location.reload()
         })
 }
 

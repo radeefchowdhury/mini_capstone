@@ -1,12 +1,12 @@
 
 "use client"
 import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
-import React, { use, useEffect, useState } from "react";
-import {RequestType} from "@/app/constants/types";
-import { getRequestDataFromCondoName, getRequestDataFromOwner, submitRequest } from "@/app/api/request/RequestAPI";
+import React, {useEffect, useState} from "react";
+import {RequestStatus, RequestType} from "@/app/constants/types";
+import {getRequestDataFromOwner, submitRequest} from "@/app/api/request/RequestAPI";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import RequestForm from "./RequestForm";
-import { getCondoIDFromName } from "@/app/api/property/PropertyAPI";
+import {getCondoIDFromName, getCondosFromOccupant} from "@/app/api/property/PropertyAPI";
 
 
 const requestTableHeaders = [
@@ -22,13 +22,12 @@ function Page(){
 
     const [requestData, setRequestData] = React.useState<RequestType[]>([]);
     const [filteredRequestData, setFilteredRequestData] = React.useState<any[]>([]);
-    const [newRequest, setNewRequest] = React.useState<RequestType>({} as RequestType);
     const [userId, setUserId] = React.useState<string>();
     const [showRequestForm, setShowRequestForm] = useState(false);
-    const [newRequestData, setNewRequestData] = React.useState<RequestType[]>([]);
     const [newCondoName, setNewCondoName] = React.useState<string>("");
     const [newType, setNewType] = React.useState<string>("");
     const [newDescription, setNewDescription] = React.useState<string>("");
+    const [condoNames, setCondoNames] = React.useState<string[]>([]);
 
 
 
@@ -39,12 +38,15 @@ function Page(){
 
     const fetchRequestData = async () => {
         console.log(userId)
-        const {data, error} = await getRequestDataFromOwner(userId);
-        if(error){
-            console.log(error)
+        const {data: requestData, error:requestError} = await getRequestDataFromOwner(userId);
+        if(requestError){
+            console.log(requestError)
             return
         }
-        if(data) setRequestData(data)
+        const {data: condoList, error:condoError} = await getCondosFromOccupant(userId);
+        let condoNames = condoList?.map((condo) => condo.name) || [];
+        if(requestData) setRequestData(requestData)
+        setCondoNames(condoNames)
     }
 
     useEffect(() => {
@@ -54,14 +56,13 @@ function Page(){
     useEffect(() => {
         if(requestData.length === 0) return;
         let filteredData;
-        
         filteredData = requestData.map((request) => {
             console.log(request)
             return{
                 condo_name: request.unit?.name,
                 request_type: request.type,
                 date_submitted: request.date,
-                amount: request.amount,
+                amount: request.amount || 'Unset',
                 status: request.status
             }
         }); 
@@ -69,34 +70,36 @@ function Page(){
         console.log(filteredData);
     }, [requestData]);
 
-
     const submitNewRequest = async () => {
-        console.log('Condo Name ', newCondoName)
-
+        if(!newType || !newCondoName || !newDescription) return;
         const response = await getCondoIDFromName(newCondoName).catch(console.error);
-        console.log(response)
-
         const data = response?.data;
-        console.log(data?.[0]?.id);
-
+        console.log({
+            description: newDescription,
+            type: newType,
+            unit_id: data?.[0]?.id,
+            status: RequestStatus.PENDING,
+            user_id: userId,
+            date: new Date().toISOString()
+        })
 
         const requestToSubmit = {
             description: newDescription,
             type: newType,
             unit_id: data?.[0]?.id,
-            status: 'PENDING',
+            status: RequestStatus.PENDING,
             user_id: userId,
             date: new Date().toISOString()
         }
-        submitRequest(requestToSubmit)
+        await submitRequest(requestToSubmit).then(() => {
+                window.location.reload()
+            }).catch(console.error);
         setShowRequestForm(false);
+    }
 
-        }
-    
-    
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
-          <div>
+          <div className={"min-w-0 max-w-full"}>
             <DashboardPanel
               title={'Requests'}
               buttonTitle={'Create New Request'}
@@ -105,16 +108,19 @@ function Page(){
             />
           </div>
           {showRequestForm && (
-            <DashboardPanel
-              title={'New Request'}
-              buttonTitle={'Submit'}
-              children={<RequestForm 
-                          condo_name={newCondoName} setCondoName={setNewCondoName}   
-                          type={newType} setType={setNewType}
-                          description={newDescription} setDescription={setNewDescription}
-                        />}
-              onClick={submitNewRequest}
-            />
+              <div className={"xl:max-w-[370px]"}>
+                <DashboardPanel
+                  title={'New Request'}
+                  buttonTitle={'Submit'}
+                  children={<RequestForm
+                              condo_name={newCondoName} setCondoName={setNewCondoName}
+                              type={newType} setType={setNewType}
+                              description={newDescription} setDescription={setNewDescription}
+                              condos={condoNames}
+                            />}
+                  onClick={submitNewRequest}
+                />
+              </div>
           )}
         </div>
       );
