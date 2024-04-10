@@ -5,6 +5,7 @@ export enum UserType {
     COMPANY = "COMPANY",
     DISCONNECTED = "DISCONNECTED"
 }
+
 export interface UserProfileType {
     id?: string;
     first_name?: string;
@@ -61,6 +62,9 @@ export interface CondoUnitType {
     occupant?: UserProfileType;
     property_id: string; // Foreign key to Property
     property_name?: string;
+    amount_due: number;
+    occupied_since: Date;
+    payments: PaymentType[];
     property: PropertyType;
     parking_spots: ParkingSpotType[];
     lockers: LockerType[];
@@ -74,10 +78,17 @@ export interface CondoFileType {
     unit: {id: number, name: string};
 }
 
-// Other types
-export interface HeaderType {
-    name: string;
-    key: string;
+export interface PaymentType {
+    id: number;
+    created_at: string;
+    amount: number;
+    paid_by: string;
+    unit_id?: number;
+    request_id?: number;
+    unit?: {id: number, name: string};
+    request?: {id: number, description: string};
+    type: 'CONDO' | 'REQUEST';
+    last_four: string;
 }
 
 export interface RequestType {
@@ -90,17 +101,18 @@ export interface RequestType {
     date: string;
     amount: number;
     status: RequestStatus;
+    payments?: PaymentType[];
     assigned_to: string;
     employee?: {id: string, name: string};
 }
 
 export enum RequestStatus {
     PENDING = "PENDING",
-    APPROVED = "APPROVED", // When a request amount is set, but not yet assigned
-    ASSIGNED = "ASSIGNED", // When a request is assigned to an employee, but amount is not set
-    IN_PROGRESS = "IN PROGRESS", // When a request is both assigned and amount is set
+    APPROVED = "APPROVED",
+    IN_PROGRESS = "IN PROGRESS",
+    PAYMENT_DUE = "PAYMENT DUE",
     DENIED = "DENIED",
-    COMPLETED = "COMPLETED"
+    COMPLETED = "COMPLETED",
 }
 
 export enum RequestTypeOptions {
@@ -109,6 +121,13 @@ export enum RequestTypeOptions {
     REPAIR = "REPAIR",
     INSPECTION = "INSPECTION",
     NEW_FACILITY = "NEW FACILITY",
+}
+
+export interface CardInfoType {
+    id: number;
+    number: string;
+    exp_date: string;
+    cvc?: string;
 }
 
 export interface EmployeeType {
@@ -140,13 +159,7 @@ export const RequestTypeToRole = {
     [RequestTypeOptions.NEW_FACILITY]: EmployeeRole.INSTALLER,
 }
 
-export interface OperationRequestType {
-    id: number;
-    condo_name: string;
-    date_submitted: string;
-    unit_id: number;
-    request_type: string;
-    amount: number;
-    status: string;
-    assigned_employee: string;
+export interface HeaderType {
+    name: string;
+    key: string;
 }
