@@ -22,7 +22,7 @@ const dropdownItems: dropdownItem[] = [
     {name: "View Operations", link: "/dashboard/operations", userTypes: [UserType.COMPANY]},
     {name: "View Requests", link: "/dashboard/requests", userTypes: [UserType.OWNER]},
     {name: "View Finances", link: "/dashboard/finances", userTypes: [UserType.COMPANY, UserType.RENTER, UserType.OWNER]},
-    {name: "View Payments", link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER]}
+    {name: "View Payments", link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER]},
 ]
 
 function Header(props: NavbarProps) {
