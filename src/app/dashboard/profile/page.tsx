@@ -1,19 +1,24 @@
 "use client"
 
-import React, {useEffect} from 'react';
-import {CompanyType, UserProfileType} from "@/app/constants/types";
+import React from 'react';
+import {CardInfoType, CompanyType, UserProfileType, UserType} from "@/app/constants/types";
 import {
     getProfilePictureURL,
-    getUserProfileById, getUserSession,
+    getUserProfileById,
+    getUserSession,
     submitUserProfile,
     uploadProfilePicture
 } from "@/app/api/userprofile/UserProfileAPI";
 import {getCompanyProfile, submitCompanyProfile} from "@/app/api/company/CompanyAPI";
+import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
+import CardInfoForm from "@/app/components/dashboard/CardInfoForm";
+import {forgetCardInfoFromUserID, getCardInfoByUserID, updateCardInfo} from "@/app/api/finance/FinanceAPI";
 
 function Page() {
     const windowClassName = "w-full p-6 bg-white shadow-sm rounded-md";
 
     const [userType, setUserType] = React.useState<'RENTER' | 'OWNER' | 'COMPANY' | null>(null);
+    const [userId, setUserId] = React.useState<string>('');
     const [userProfile, setUserProfile] = React.useState<UserProfileType>({} as UserProfileType);
     const [companyProfile, setCompanyProfile] = React.useState<CompanyType>({} as CompanyType);
 
@@ -22,6 +27,8 @@ function Page() {
 
     const [profileError, setProfileError] = React.useState<string>('');
     const [fileError, setFileError] = React.useState<string>('');
+
+    const [cardInfo, setCardInfo] = React.useState<CardInfoType>({} as CardInfoType);
 
 
     const saveProfileChanges = () => {
@@ -46,19 +53,34 @@ function Page() {
         }))
     }
 
+    const saveCardInfoChanges = async () => {
+        updateCardInfo(userId, cardInfo).then(() => {
+            // window.location.reload()
+        }).catch(console.error)
+    }
+
+    const forgetCardInfo = async () => {
+        forgetCardInfoFromUserID(userId).then(() => {
+            // window.location.reload()
+        }).catch(console.error)
+    }
+
     const fetchUserData = async () => {
         const userSession = await getUserSession()
         if (!userSession) {
             window.location.href = '/login'
             return
         }
-        const {data, error} = await getUserProfileById(userSession.user.id)
-        if (error || !data){
+        const {data: profileData, error} = await getUserProfileById(userSession.user.id)
+        const {data: cardInfoData, error: cardInfoError} = await getCardInfoByUserID(userSession.user.id)
+        if (error || !profileData ){
             console.error(error?.message || 'Error fetching user profile')
             return
         }
-        if(data[0].profile_picture) data[0].profile_picture += `?${Date.now()}`
-        setUserProfile(data[0])
+        if(profileData[0].profile_picture) profileData[0].profile_picture += `?${Date.now()}`
+        if(cardInfoData && cardInfoData[0].card_info) setCardInfo(cardInfoData[0].card_info as unknown as CardInfoType)
+        else setCardInfo({} as CardInfoType)
+        setUserProfile(profileData[0])
     }
 
     const fetchCompanyData = async () => {
@@ -179,7 +201,6 @@ function Page() {
         updateUserProfile('profile_picture', fileURL)
     }
 
-
     React.useEffect(() => {
         if(!userProfile.profile_picture == undefined || !userProfile.profile_picture) return
         // If the profile picture is a blob, it means the userProfile has not been submitted yet
@@ -198,6 +219,7 @@ function Page() {
     // Fetch user profile data
     React.useEffect(() => {
         setUserType(localStorage.getItem('user_role') as 'RENTER' | 'OWNER' | 'COMPANY')
+        setUserId(localStorage.getItem('user_id') as string);
     }, []);
 
     React.useEffect(() => {
@@ -292,6 +314,23 @@ function Page() {
                             </div>
                         </div>
                     </div>
+                    {(userType === UserType.OWNER || userType === UserType.RENTER) &&
+                    <DashboardPanel
+                        title={'Card Information'}
+                        buttonTitle={'Save'}
+                        onClick={saveCardInfoChanges}
+                        children={<div>
+                            <CardInfoForm
+                                cardInfo={cardInfo}
+                                setCardInfo={setCardInfo}
+                                from={"PROFILE"}
+                            />
+                            <button onClick={forgetCardInfo}
+                                    className="mt-4 px-3 py-1 h-7 bg-red-400 rounded-lg hover:bg-red-600 text-sm justify-center items-center gap-2.5 inline-flex">
+                                <span className="font-medium text-white">Forget Card Info</span>
+                            </button>
+                        </div>}
+                    />}
                 </div>
 
                 {(userType === "RENTER" || userType === "OWNER") &&
