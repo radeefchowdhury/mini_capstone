@@ -20,7 +20,8 @@ function DashboardTable(props: DashboardTableProps) {
                 </thead>
                 <tbody>
                     {items.map((item, index) => (
-                        <tr key={index}>
+                        // make odd rows a different color
+                        <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : ""}>
                             {headers.map((header, index) => (
                                 <td className={"px-4"} key={index}>{item[header.key] || ""}</td>
                             ))}
