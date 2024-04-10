@@ -1,4 +1,3 @@
-
 "use client"
 import DashboardPanel from "@/app/components/dashboard/DashboardPanel";
 import React, {useEffect} from "react";
@@ -55,8 +54,6 @@ function Page(){
         let newStatus: RequestStatus = selectedRequest.status;
         if(!selectedRequest.assigned_to && selectedRequest.amount)
             newStatus = RequestStatus.APPROVED;
-        if(selectedRequest.assigned_to && !selectedRequest.amount)
-            newStatus = RequestStatus.ASSIGNED;
         if(selectedRequest.assigned_to && selectedRequest.amount)
             newStatus = RequestStatus.IN_PROGRESS;
         const updatedRequest = {...selectedRequest, status: newStatus};
@@ -68,8 +65,21 @@ function Page(){
         })
     }
 
-    const completeRequest = async(request: RequestType) => {
-        const updatedRequest = {...request, status: RequestStatus.COMPLETED};
+    const finishRequest = async(request: RequestType) => {
+        const confirmation = confirm("Are you sure you want to finish this request?")
+        if(!confirmation) return;
+        const updatedRequest = {...request, status: RequestStatus.PAYMENT_DUE};
+        delete updatedRequest.condo;
+        delete updatedRequest.employee
+        await submitRequest(updatedRequest).then(res => {
+            window.location.reload();
+        })
+    }
+
+    const denyRequest = async(request: RequestType) => {
+        const confirmation = confirm("Are you sure you want to deny this request?")
+        if(!confirmation) return;
+        const updatedRequest = {...request, status: RequestStatus.DENIED};
         delete updatedRequest.condo;
         delete updatedRequest.employee
         await submitRequest(updatedRequest).then(res => {
@@ -86,19 +96,59 @@ function Page(){
         let filteredData;
 
         filteredData = operationRequestData.map((operationRequest) => {
-        return {
-            id: operationRequest.id,
-            condo_name: operationRequest.condo?.name,
-            request_type: operationRequest.type,
-            date_submitted: operationRequest.date,
-            amount: operationRequest.amount ? operationRequest.amount : 'Unset',
-            status: operationRequest.status,
-            assigned_to: operationRequest.assigned_to ? (operationRequest.employee?.name) : 'Unassigned',
-            actions:
-            <div className={"flex flex-row gap-3 px-2"}>
-                <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)} />
-                <ActionButton title={'Complete'} onClick={() => completeRequest(operationRequest)} />
-            </div>
+            const requestStatusColor = {
+                'PENDING': 'bg-yellow-100 text-yellow-700',
+                'COMPLETED': 'bg-green-100 text-green-700',
+                'APPROVED': 'bg-teal-100 text-teal-700',
+                'REJECTED': 'bg-red-100 text-red-700',
+                'IN PROGRESS': 'bg-amber-100 text-amber-700',
+                'PAYMENT DUE': 'bg-lime-100 text-lime-700',
+                'DENIED': 'bg-red-100 text-red-700'
+            }
+
+            return {
+                id: operationRequest.id,
+                condo_name: operationRequest.condo?.name,
+                request_type: operationRequest.type,
+                date_submitted: operationRequest.date,
+                amount: operationRequest.amount ? operationRequest.amount : 'Unset',
+                status: <div
+                    className={`mx-auto rounded-md py-[2px] w-[120px] px-3 ${requestStatusColor[operationRequest.status as unknown as
+                        keyof typeof requestStatusColor
+                        ]}`}>
+                    {operationRequest.status.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}
+                </div>,
+                assigned_to: operationRequest.assigned_to ? (operationRequest.employee?.name) : 'Unassigned',
+                actions: operationRequest.status === RequestStatus.IN_PROGRESS ?
+                    <div className={"flex flex-row gap-3 px-2"}>
+                        <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)}/>
+                        <ActionButton title={'Finish'} onClick={() => finishRequest(operationRequest)}/>
+                        <button disabled={true}
+                                className={"flex cursor-not-allowed items-center justify-center py-1 px-3 mx-auto text-stone-600 bg-gray-200 text-sm rounded-md"}>
+                            Deny
+                        </button>
+                    </div> :
+                    operationRequest.status === RequestStatus.PENDING ?
+                        <div className={"flex flex-row gap-3 px-2"}>
+                            <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)}/>
+                        <button disabled={true}
+                                className={"flex cursor-not-allowed items-center justify-center py-1 px-3 mx-auto text-stone-600 bg-gray-200 text-sm rounded-md"}>
+                            Finish
+                        </button>
+                        <ActionButton title={'Deny'} onClick={() => denyRequest(operationRequest)} />
+                    </div> :
+                    <div className={"flex flex-row gap-3 px-2"}>
+                        <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)}/>
+                        <button disabled={true}
+                                className={"flex cursor-not-allowed items-center justify-center py-1 px-3 mx-auto text-stone-600 bg-gray-200 text-sm rounded-md"}>
+                            Finish
+                        </button>
+                        <button disabled={true}
+                                className={"flex cursor-not-allowed items-center justify-center py-1 px-3 mx-auto text-stone-600 bg-gray-200 text-sm rounded-md"}>
+                            Deny
+                        </button>
+                    </div>
+
             }
         });
         // sort by id in descending order
@@ -108,8 +158,6 @@ function Page(){
     }, [operationRequestData]);
 
 
-
-    
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
             <div className={`min-w-0 ${editingRequest ? 'max-w-full' : 'max-w-fit'} `}>
@@ -119,7 +167,7 @@ function Page(){
                 />
             </div>
             {editingRequest &&
-            <div className={"min-w-[370px]"}>
+                <div className={"min-w-[370px]"}>
                 <DashboardPanel
                     title={"Edit Request"}
                     children={<OperationRequestForm
