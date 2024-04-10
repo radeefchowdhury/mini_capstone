@@ -1,11 +1,13 @@
 'use client'
 
 
-import React, { useState, useEffect, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
+    BanknotesIcon,
     BuildingOffice2Icon,
     BuildingOfficeIcon,
-    CurrencyDollarIcon, PencilSquareIcon,
+    CurrencyDollarIcon,
+    PencilSquareIcon,
     QueueListIcon,
     Squares2X2Icon
 } from "@heroicons/react/24/outline";
@@ -29,8 +31,9 @@ const navItems = [
     { name: "View Properties", icon: BuildingOffice2Icon, link: "/dashboard/properties", userTypes: [UserType.COMPANY] },
     { name: "View Units", icon: BuildingOfficeIcon, link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY] },
     { name: "View Operations", icon: Squares2X2Icon, link: "/dashboard/operations", userTypes: [UserType.COMPANY] },
-    { name: "View Finances", icon: CurrencyDollarIcon, link: "/dashboard/finances", userTypes: [UserType.COMPANY] },
     { name: "View Requests", icon: QueueListIcon, link: "/dashboard/requests", userTypes: [UserType.OWNER] },
+    { name: "View Finances", icon: CurrencyDollarIcon, link: "/dashboard/finances", userTypes: [UserType.COMPANY, UserType.OWNER, UserType.RENTER] },
+    { name: "View Payments", icon: BanknotesIcon, link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER] },
 ]
 
 export default function SideNav(props: SideNavProps) {
