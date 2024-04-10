@@ -20,8 +20,9 @@ const dropdownItems: dropdownItem[] = [
     {name: "View Properties", link: "/dashboard/properties", userTypes: [UserType.COMPANY]},
     {name: "View Units", link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY]},
     {name: "View Operations", link: "/dashboard/operations", userTypes: [UserType.COMPANY]},
-    {name: "View Finances", link: "/dashboard/finances", userTypes: [UserType.COMPANY]},
-    {name: "View Requests", link: "/dashboard/requests", userTypes: [UserType.OWNER]}
+    {name: "View Requests", link: "/dashboard/requests", userTypes: [UserType.OWNER]},
+    {name: "View Finances", link: "/dashboard/finances", userTypes: [UserType.COMPANY, UserType.RENTER, UserType.OWNER]},
+    {name: "View Payments", link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER]}
 ]
 
 function Header(props: NavbarProps) {
@@ -113,10 +114,14 @@ function Header(props: NavbarProps) {
                             <div ref={dropdownRef}
                                 className={`${toggleDropdown ? 'opacity-100' : 'opacity-0'}  pt-2 transition-opacity absolute xl:right-[-70px] right-[5px] top-[56px] text-gray-600 inline-block z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44`}>
                                 <div className={"pb-2"}>
-                                {dropdownItems.filter((item) => item.userTypes.includes(userType as UserType)).map((item) => (
-                                    <div key={item.name} className="" onClick={() => setToggleDropdown(false)}>
+                                {dropdownItems.filter((item) => item.userTypes.includes(userType as UserType)).map((item, index) => (
+                                    <div key={index}>
+                                        <div
+                                             className="" onClick={() => setToggleDropdown(false)}>
                                         <a href={item.link}
                                            className="block px-4 py-2 text-sm hover:bg-gray-100 hover:text-gray-800">{item.name}</a>
+                                        </div>
+                                        {item.name === "Edit Profile" && <hr className="border-gray-100 my-2"/>}
                                     </div>
                                 ))}
                                 </div>
