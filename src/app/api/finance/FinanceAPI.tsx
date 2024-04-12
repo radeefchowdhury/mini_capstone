@@ -1,5 +1,7 @@
 import connection from "@/app/api/supabase/SupabaseContextProvider";
-import {CondoUnitType, RequestType} from "@/app/constants/types";
+import {CondoUnitType, RequestType, UserType} from "@/app/constants/types";
+import {neq} from "semver";
+import {getCondosFromCompany, getCondosFromOccupant} from "@/app/api/property/PropertyAPI";
 
 const supabase = connection;
 
@@ -48,16 +50,16 @@ export const getCondoPaymentData = (unit: CondoUnitType) => {
     else if(amountPaid < totalAmountDue) status = PaymentStatus.INCOMPLETE;
     else if(amountPaid > totalAmountDue) status = PaymentStatus.OVERDUE;
 
-    console.log(amount_due, amountPaid, status)
+    // console.log(amount_due, amountPaid, status)
 
     return {data:{
         condo_fee,
         parking_fee,
         locker_fee,
         total_fee,
-        amount_due,
-        amount_paid: amountPaid,
-        status
+        amount_due : unit.occupied_by ? amount_due : 0,
+        amount_paid: unit.occupied_by ? amountPaid : 0,
+        status: unit.occupied_by ? status : PaymentStatus.UNOCCUPIED
     }};
 }
 
@@ -82,6 +84,128 @@ export const getRequestPaymentData = (request: RequestType) => {
         amount_paid: amount_paid,
         status
     }};
+}
+
+export const getOperationalBudget = async (company_id: any) => {
+    // get all payments of type 'CONDO' for which unit_id is owned by the company
+    const {data: paymentData, error: paymentError} = await supabase
+        .from('Payment')
+        .select('amount, unit:CondoUnit(property:Property(*, company_id))')
+        .eq('unit.property.company_id', company_id)
+    if (paymentError) {
+        console.error(paymentError);
+        return {data: null, error: paymentError};
+    } else {
+        const totalAmount = paymentData.reduce((sum, record) => {
+            if(!record.unit) return sum;
+            return sum + parseFloat(record.amount);
+        }, 0);
+        return {data: totalAmount, error: null};
+    }
+}
+
+export const getOperationalExpenses = async (company_id: any) => {
+    // get all payments of type 'REQUEST' for which unit_id is owned by the company
+    const {data: paymentData, error: paymentError} = await supabase
+        .from('Payment')
+        .select('amount, request:Request(unit:CondoUnit(property:Property(*, company_id)))')
+        .eq('request.unit.property.company_id', company_id);
+    if (paymentError) {
+        console.error(paymentError);
+        return {data: null, error: paymentError};
+    } else {
+        const totalAmount = paymentData.reduce((sum, record) => {
+            if(!record.request) return sum;
+            return sum + parseFloat(record.amount);
+        }, 0);
+        return {data: totalAmount, error: null};
+    }
+}
+
+export const getTotalAmountDue = async (user_id: string, type: UserType) => {
+    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    const getCondosFunction = {
+        [UserType.COMPANY]: getCondosFromCompany,
+        [UserType.OWNER]: getCondosFromOccupant,
+        [UserType.RENTER]: getCondosFromOccupant,
+    };
+    const {data: condoData, error: condoError} = await getCondosFunction[type](user_id);
+    console.log(condoData, condoError)
+    if (condoError) {
+        console.error(condoError);
+        return {data: null, error: condoError};
+    } else {
+        if(!condoData) return {data: 0, error: null}
+        const totalAmount = condoData.reduce((sum, record) => {
+            const condoPaymentData = getCondoPaymentData(record);
+            return sum + condoPaymentData.data.amount_due;
+        }, 0);
+        return {data: totalAmount, error: null};
+    }
+}
+
+export const getTotalAmountPaid = async (user_id: string, type: UserType) => {
+    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    const getCondosFunction = {
+        [UserType.COMPANY]: getCondosFromCompany,
+        [UserType.OWNER]: getCondosFromOccupant,
+        [UserType.RENTER]: getCondosFromOccupant,
+    };
+    const {data: condoData, error: condoError} = await getCondosFunction[type](user_id);
+    if (condoError) {
+        console.error(condoError);
+        return {data: null, error: condoError};
+    } else {
+        if(!condoData) return {data: 0, error: null}
+        const totalAmount = condoData.reduce((sum, record) => {
+            const condoPaymentData = getCondoPaymentData(record);
+            return sum + condoPaymentData.data.amount_paid;
+        }, 0);
+        return {data: totalAmount, error: null};
+    }
+}
+
+export const getFinanceWidgetData = async (user_id: string, type: UserType) => {
+    // Get total amount due, total amount paid, number of paid units, number of unpaid units, number of incomplete units
+    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    const getCondosFunction = {
+        [UserType.COMPANY]: getCondosFromCompany,
+        [UserType.OWNER]: getCondosFromOccupant,
+        [UserType.RENTER]: getCondosFromOccupant,
+    };
+    const {data: condoData, error: condoError} = await getCondosFunction[type](user_id);
+    if (condoError) {
+        console.error(condoError);
+        return {data: null, error: condoError};
+    } else {
+        if(!condoData) return {data: null, error: null}
+        const totalAmountDue = await getTotalAmountDue(user_id, type);
+        const totalAmountPaid = await getTotalAmountPaid(user_id, type);
+        const totalUnits = condoData.length;
+        const paidUnits = condoData.reduce((sum, record) => {
+            const condoPaymentData = getCondoPaymentData(record);
+            if(condoPaymentData.data.status === PaymentStatus.PAID) return sum + 1;
+            return sum;
+        }, 0);
+        const unpaidUnits = condoData.reduce((sum, record) => {
+            const condoPaymentData = getCondoPaymentData(record);
+            if(condoPaymentData.data.status === PaymentStatus.UNPAID) return sum + 1;
+            return sum;
+        }, 0);
+        const incompleteUnits = condoData.reduce((sum, record) => {
+            const condoPaymentData = getCondoPaymentData(record);
+            if(condoPaymentData.data.status === PaymentStatus.INCOMPLETE) return sum + 1;
+            return sum;
+        }, 0);
+        return {data: {
+            totalAmountDue: totalAmountDue.data,
+            totalAmountPaid: totalAmountPaid.data,
+            totalUnits,
+            paidUnits,
+            unpaidUnits,
+            incompleteUnits
+        }, error: null};
+    }
 }
 
 export const getPaymentsByUserID = async (id: any)  => {
