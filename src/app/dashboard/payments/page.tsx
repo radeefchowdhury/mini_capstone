@@ -83,11 +83,10 @@ function Page() {
         }
         await submitNewPayment(paymentToSubmit).catch(console.error)
             .then(() => checkToUpdateRequestStatus(paymentToSubmit as PaymentType))
-            .then(() => {window.location.href = '/dashboard/payments'})
     }
 
     const checkToUpdateRequestStatus = async (payment: PaymentType) => {
-        if(!payment.request_id) return;
+        if(!payment.request_id) window.location.href = '/dashboard/payments'
         const {data: requestData, error: requestError} = await getRequestByID(payment.request_id)
         if(requestError || !requestData){
             console.error(requestError);
@@ -100,8 +99,7 @@ function Page() {
             updateRequestStatus(payment.request_id, 'COMPLETED').then(() => {
                 window.location.href = '/dashboard/payments'
             }).catch(console.error)
-        }
-
+        } else window.location.href = '/dashboard/payments'
     }
 
     const fetchPayments = async () => {
@@ -143,6 +141,10 @@ function Page() {
                 card_number: '**** **** **** ' + payment.last_four,
                 type: payment.type,
             }
+        });
+        // sort by date
+        filteredPayments.sort((a, b) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
         });
         setFilteredPayments(filteredPayments || []);
     }, [payments]);
