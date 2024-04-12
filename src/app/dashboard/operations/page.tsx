@@ -6,9 +6,11 @@ import {submitRequest} from "@/app/api/request/RequestAPI";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import {getRequestsFromCompany} from "@/app/api/company/CompanyAPI";
 import ActionIcon from "@/app/components/dashboard/ActionIcon";
-import {PencilSquareIcon} from "@heroicons/react/24/outline";
+import {ArrowDownCircleIcon, ArrowUpCircleIcon, PencilSquareIcon} from "@heroicons/react/24/outline";
 import OperationRequestForm from "@/app/dashboard/operations/OperationRequestForm";
 import ActionButton from "@/app/components/dashboard/ActionButton";
+import DashboardWidget from "@/app/components/dashboard/DashboardWidget";
+import {getOperationalBudget, getOperationalExpenses} from "@/app/api/finance/FinanceAPI";
 
 
 const operationHeaders = [
@@ -26,6 +28,8 @@ function Page(){
     const [editingRequest, setEditingRequest] = React.useState<boolean>();
     const [filteredRequestData, setFilteredRequestData] = React.useState<any[]>([]);
     const [selectedRequest, setSelectedRequest] = React.useState<RequestType>({} as RequestType);
+    const [budget, setBudget] = React.useState<number>(0);
+    const [costs, setCosts] = React.useState<number>(0);
     const [userId, setUserId] = React.useState<string>();
 
     useEffect(() => {
@@ -33,13 +37,11 @@ function Page(){
     }, []);
 
     const fetchOperationRequestData = async () => {
-      console.log(userId)
         const {data, error} = await getRequestsFromCompany(userId);
         if(error){
             console.log(error)
             return
         }
-        console.log(data);
        if(data) setOperationRequestData(data)
     }
 
@@ -86,6 +88,27 @@ function Page(){
             window.location.reload();
         })
     }
+
+    const fetchOperationBudget = async() => {
+        // Retrieve operational budget
+        const {data, error} = await getOperationalBudget(userId);
+        if(data) setBudget(data);
+    }
+
+    const fetchOperationCosts = async() => {
+        // Retrieve operational costs
+        const {data, error} = await getOperationalExpenses(userId);
+        if(data) setCosts(data);
+    }
+
+    useEffect(() => {
+        // Retrieve operational budget
+        if(!userId) return;
+        fetchOperationBudget().catch(console.error)
+        fetchOperationCosts().catch(console.error)
+
+        // Retrieve operational costs
+    }, [operationRequestData, userId]);
 
     useEffect(() => {
         if(userId) fetchOperationRequestData().catch(console.error);
@@ -154,17 +177,32 @@ function Page(){
         // sort by id in descending order
         filteredData.sort((a, b) => b.id - a.id);
         setFilteredRequestData(filteredData);
-        console.log(filteredData);
     }, [operationRequestData]);
 
 
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
             <div className={`min-w-0 ${editingRequest ? 'max-w-full' : 'max-w-fit'} `}>
-                <DashboardPanel
-                    title={'Operation Requests'}
-                    children={<DashboardTable items={filteredRequestData} headers={operationHeaders}/>}
-                />
+                <div className={"flex flex-col gap-4"}>
+                    <div className={"flex flex-row gap-4"}>
+                        <DashboardWidget
+                            icon={ArrowDownCircleIcon}
+                             icon_color={"bg-blue-500"}
+                             title={"Operational Budget"}
+                             value={`$${budget.toFixed(2)}`}
+                        />
+                        <DashboardWidget
+                            icon={ArrowUpCircleIcon}
+                            icon_color={"bg-orange-600"}
+                            title={"Operational Costs"}
+                            value={`$${costs.toFixed(2)}`}
+                        />
+                    </div>
+                    <DashboardPanel
+                        title={'Operation Requests'}
+                        children={<DashboardTable items={filteredRequestData} headers={operationHeaders}/>}
+                    />
+                </div>
             </div>
             {editingRequest &&
                 <div className={"min-w-[370px]"}>

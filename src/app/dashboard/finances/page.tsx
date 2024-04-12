@@ -7,9 +7,22 @@ import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import {getCondosFromCompany, getCondosFromOccupant} from "@/app/api/property/PropertyAPI";
 import ActionButton from "@/app/components/dashboard/ActionButton";
 import ActionIcon from "@/app/components/dashboard/ActionIcon";
-import {ArrowUpRightIcon} from "@heroicons/react/24/outline";
+import {
+    ArrowDownCircleIcon,
+    ArrowUpCircleIcon,
+    ArrowUpRightIcon,
+    CheckCircleIcon,
+    EllipsisHorizontalCircleIcon, ExclamationCircleIcon, ExclamationTriangleIcon
+} from "@heroicons/react/24/outline";
 import FinancePaymentsView from "@/app/dashboard/finances/FinancePaymentsView";
-import {getCondoPaymentData, updateCondoFee} from "@/app/api/finance/FinanceAPI";
+import {
+    getCondoPaymentData,
+    getFinanceWidgetData,
+    getTotalAmountDue,
+    getTotalAmountPaid,
+    updateCondoFee
+} from "@/app/api/finance/FinanceAPI";
+import DashboardWidget from "@/app/components/dashboard/DashboardWidget";
 
 const financialHeaders = [
     {name: 'ID', key: 'id'},
@@ -23,6 +36,15 @@ const financialHeaders = [
     {name: 'Actions', key: 'actions'},
 ]
 
+interface WidgetDataType {
+    totalAmountDue: number;
+    totalAmountPaid: number;
+    totalUnits: number;
+    paidUnits: number;
+    unpaidUnits: number;
+    incompleteUnits: number;
+}
+
 function Page() {
     const [userType, setUserType] = React.useState<string>();
     const [userId, setUserId] = React.useState<string>();
@@ -31,6 +53,7 @@ function Page() {
     const [filteredUnits, setFilteredUnits] = React.useState<any[]>([]);
     const [showUnitForm, setShowUnitForm] = React.useState<boolean>(false);
     const [showPaymentsView, setShowPaymentsView] = React.useState<boolean>(false);
+    const [widgetData, setWidgetData] = React.useState<WidgetDataType>({} as WidgetDataType);
 
     const generateAnnualReport = async () => {
         // Generate annual report
@@ -76,6 +99,16 @@ function Page() {
         }
     }
 
+    const fetchWidgetData = async () => {
+        if(!userId || !userType) return;
+        const {data: widgetData, error: widgetError} = await getFinanceWidgetData(userId, userType as UserType);
+        if(widgetError){
+            console.log(widgetError)
+            return
+        }
+        if(widgetData) setWidgetData(widgetData);
+    }
+
     useEffect(() => {
         setUserId(localStorage.getItem('user_id') as string);
         setUserType(localStorage.getItem('user_role') as string);
@@ -89,7 +122,7 @@ function Page() {
                 'Incomplete': 'bg-orange-100 text-orange-700',
                 'Overdue': 'bg-red-100 text-red-700',
                 'Unpaid': 'bg-red-100 text-red-700',
-                'Unoccupied' : 'bg-gray-100 text-gray-700',
+                'Unoccupied' : 'bg-gray-200 text-gray-600',
             };
 
             return {
@@ -119,7 +152,9 @@ function Page() {
     }, [condoUnits]);
 
     useEffect(() => {
-        if(userId) fetchFinancialData().catch(console.error);
+        if(!userId) return
+        fetchWidgetData().catch(console.error);
+        fetchFinancialData().catch(console.error);
     }, [userId]);
 
     return (
@@ -131,12 +166,22 @@ function Page() {
                     setIsVisible={setShowPaymentsView}
                 />}
             <div className={"min-w-0 max-w-fit"}>
-                <DashboardPanel
-                    title={'Units Finances'}
-                    buttonTitle={userType === UserType.COMPANY ? 'Generate Annual Report' : undefined}
-                    onClick={() => generateAnnualReport()}
-                    children={<DashboardTable items={filteredUnits} headers={financialHeaders}/>}
-                />
+                <div className={"flex flex-col gap-4"}>
+                    <div className={"flex flex-row gap-4"}>
+                        <DashboardWidget icon={ArrowUpCircleIcon} icon_color={"bg-blue-600"} title={"Total Amount Paid"} value={`$${widgetData.totalAmountPaid?.toFixed(2) || '0'}`}/>
+                        <DashboardWidget icon={ArrowDownCircleIcon} icon_color={"bg-orange-600"} title={"Total Amount Due"} value={`$${widgetData.totalAmountDue?.toFixed(2) || '0'}`}/>
+                        <DashboardWidget icon={CheckCircleIcon} icon_color={"bg-green-600"} title={"Paid Units"} value={`${widgetData.paidUnits || '0'}`}/>
+                        <DashboardWidget icon={EllipsisHorizontalCircleIcon} icon_color={"bg-green-600"} title={"Incomplete Units"} value={`${widgetData.incompleteUnits || '0'}`}/>
+                        <DashboardWidget icon={ExclamationTriangleIcon} icon_color={"bg-red-600"} title={"Unpaid Units"} value={`${widgetData.unpaidUnits || '0'}`}/>
+
+                    </div>
+                    <DashboardPanel
+                        title={'Units Finances'}
+                        buttonTitle={userType === UserType.COMPANY ? 'Generate Annual Report' : undefined}
+                        onClick={() => generateAnnualReport()}
+                        children={<DashboardTable items={filteredUnits} headers={financialHeaders}/>}
+                    />
+                </div>
             </div>
             <div className={`${(showUnitForm && selectedUnit) ? '' : 'hidden'} min-w-[370px]`}>
                 {(showUnitForm && selectedUnit) && <DashboardPanel
