@@ -4,10 +4,12 @@ import React, {useEffect} from "react";
 import {
     getCondosFromCompany,
     getCondosFromOccupant,
-    getPropertyIdByName, registerCondoUnitWithKey,
-    submitCondoProfile, updateRegistrationKey
+    getPropertiesFromCompany,
+    registerCondoUnitWithKey,
+    submitCondoProfile,
+    updateRegistrationKey
 } from "@/app/api/property/PropertyAPI";
-import {CondoUnitType, UserType} from "@/app/constants/types";
+import {CondoUnitType, PropertyType, UserType} from "@/app/constants/types";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import CondoUnitInfo from "@/app/dashboard/units/CondoUnitInfo";
 import ActionButton from "@/app/components/dashboard/ActionButton";
@@ -16,17 +18,14 @@ import ActionIcon from "@/app/components/dashboard/ActionIcon";
 import {PencilSquareIcon} from "@heroicons/react/24/outline";
 import UnitsFilesView from "@/app/dashboard/units/UnitsFilesView";
 import ParkingLockerView from "@/app/components/dashboard/ParkingLockerView";
-import {
-    getParkingLockerListFromProperty as getLockerPropertyListFromProperty,
-    getParkingLockerListFromProperty
-} from "@/app/api/property/ParkingLockerAPI";
+import {getParkingLockerListFromProperty} from "@/app/api/property/ParkingLockerAPI";
 
 const condoTableHeaders = [
+    {name: 'ID', key: 'id'},
     {name: 'Condo Name', key: 'name'},
     {name: 'Property Name', key: 'property_name'},
     {name: 'Address', key: 'address'},
     {name: 'Condo Number', key: 'number'},
-    {name: 'Fee ($)', key: 'fee'},
     {name: 'Size (m²)', key: 'size'},
     {name: 'Parking Spots', key: 'view_parking'},
     {name: 'Lockers', key: 'view_lockers'},
@@ -34,40 +33,44 @@ const condoTableHeaders = [
 ]
 
 const condoTableHeadersForCompany = [
+    {name: 'ID', key: 'id'},
     {name: 'Condo Name', key: 'name'},
     {name: 'Property Name', key: 'property_name'},
     {name: 'Address', key: 'address'},
     {name: 'Condo Number', key: 'number'},
-    {name: 'Fee ($)', key: 'fee'},
     {name: 'Size (m²)', key: 'size'},
     {name: 'Parking Spots', key: 'view_parking'},
     {name: 'Lockers', key: 'view_lockers'},
     {name: 'View Files', key: 'view_files'},
-    {name: 'Registration Key', key: 'registration_key'},
     {name: 'Occupied By', key: 'occupant'},
+    {name: 'Registration Key', key: 'registration_key'},
     {name: 'Actions', key: 'actions'},
 ]
 
 function Page() {
 
     const [userType, setUserType] = React.useState<UserType>();
+    const [userId, setUserId] = React.useState<string>();
     const [condoData, setCondoData] = React.useState<CondoUnitType[]>([]);
     const [filteredCondoData, setFilteredCondoData] = React.useState<any[]>([]);
-    const [userId, setUserId] = React.useState<string>();
+
+    const [propertyList, setPropertyList] = React.useState<PropertyType[]>([]);
     const [selectedCondo, setSelectedCondo] = React.useState<CondoUnitType>();
     const [newCondoProfile, setNewCondoProfile] = React.useState<CondoUnitType>({} as CondoUnitType);
     const [formAction, setFormAction] = React.useState<'EDIT' | 'CREATE'>();
-    const [registrationKey, setRegistrationKey] = React.useState<string>("");
-
     const [viewFiles, setViewFiles] = React.useState<boolean>(false);
-    const [selectedCondoView, setSelectedCondoView] = React.useState<CondoUnitType>({} as CondoUnitType);
 
+    const [selectedCondoView, setSelectedCondoView] = React.useState<CondoUnitType>({} as CondoUnitType);
     const [viewParkingLocker, setViewParkingLocker] = React.useState<boolean>(false);
+
     const [parkingLockerView, setParkingLockerView] = React.useState<'PARKING' | 'LOCKER'>('PARKING');
     const [parkingLockerList, setParkingLockerList] = React.useState<any[]>([]);
 
+    const [registrationKey, setRegistrationKey] = React.useState<string>("");
+
     const registerNewUnit = () => {
-        setFormAction('CREATE')
+        // Toggle Form
+        setFormAction(formAction ? undefined : 'CREATE')
     }
 
     const generateUUID = () => {
@@ -90,22 +93,15 @@ function Page() {
     }
 
     const submitNewUnit = () => {
-        getPropertyIdByName(newCondoProfile.property_name).then((res ) => {
-            if(res.error){
-                console.log(res.error)
-                return
-            }
-            if(!res.data) return
-            const condoToSubmit = {
-                name: newCondoProfile.name,
-                number: newCondoProfile.number,
-                description: newCondoProfile.description || "",
-                fee: newCondoProfile.fee,
-                size: newCondoProfile.size,
-                property_id: res.data[0].id,
-            }
-            submitCondoProfile(condoToSubmit).catch(console.error)
-        }).catch(console.error)
+        const condoToSubmit = {
+            name: newCondoProfile.name,
+            number: newCondoProfile.number,
+            description: newCondoProfile.description || "",
+            fee: newCondoProfile.fee,
+            size: newCondoProfile.size,
+            property_id: newCondoProfile.property_id,
+        }
+        submitCondoProfile(condoToSubmit).catch(console.error)
     }
 
     const selectCondoUnit = (unit: CondoUnitType) => {
@@ -139,12 +135,14 @@ function Page() {
             if(data) setCondoData(data)
         }
         if(userType === "COMPANY"){
-            const {data, error} = await getCondosFromCompany(userId);
-            if(error){
-                console.log(error)
+            const {data: condoData, error: condoError} = await getCondosFromCompany(userId);
+            const {data: propertyData, error: propertyError} = await getPropertiesFromCompany(userId);
+            if(condoError || propertyError){
+                console.log(condoError, propertyError)
                 return
             }
-            if(data) setCondoData(data)
+            if(condoData) setCondoData(condoData)
+            if(propertyData) setPropertyList(propertyData)
         }
     }
 
@@ -171,26 +169,22 @@ function Page() {
                     description: unit.description,
                     fee: unit.fee,
                     size: unit.size,
-                    view_parking: <ActionButton title={`View Parking`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
-                    view_lockers: <ActionButton title={`View Lockers`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
-                    view_files: <ActionButton title={`View Files (${unit.files ? unit.files.length : 0})`} onClick={() => viewCondoFiles(unit)}/>,
+                    view_parking: <ActionButton text={`View Parking`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                    view_lockers: <ActionButton text={`View Lockers`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
+                    view_files: <ActionButton text={`View Files (${unit.files ? unit.files.length : 0})`} onClick={() => viewCondoFiles(unit)}/>,
                     registration_key:
-                        <button
-                            className={`${unit.registration_key ? 
-                                "flex items-center justify-center py-1 px-3 mx-auto bg-blue-500 hover:bg-blue-700 text-white text-sm rounded-md" : 
-                                "flex items-center justify-center py-1 px-3 mx-auto bg-gray-300 text-gray-500 text-sm rounded-md cursor-default"}`}
+                        <ActionButton
+                            text={unit.registration_key ? "Copy Key" : "No Key"}
+                            tooltip={unit.registration_key || "Generate a key first"}
                             onClick={() => navigator.clipboard.writeText(unit.registration_key as string)}
-                            disabled={!unit.registration_key}
-                            title={unit.registration_key}>
-                            {unit.registration_key ? "Copy Key" : "No Key"}
-                        </button>,
+                            disabled={!unit.registration_key}/>,
                     occupant: unit.occupant ?
                         <div>{unit.occupant.first_name + " " + unit.occupant.last_name}</div> :
-                        <div className={"text-stone-600"}>Unoccupied</div>,
+                        <div className={"text-gray-600 bg-gray-200 p-1 rounded-md"}>Unoccupied</div>,
                     actions: (
                         <div className={"flex flex-row gap-4 py-2 px-3"}>
-                            <ActionButton title={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
                             <ActionIcon Icon={PencilSquareIcon} onClick={() => selectCondoUnit(unit)}/>
+                            <ActionButton text={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
                         </div>
                     )
                 }
@@ -206,13 +200,15 @@ function Page() {
                 description: unit.description,
                 fee: unit.fee,
                 size: unit.size,
-                view_parking: <ActionButton title={`View Parking (${unit.parking_spots.length})`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
-                view_lockers: <ActionButton title={`View Lockers (${unit.lockers ? unit.lockers.length : 0})`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
-                view_files: <ActionButton title={'View Files'} onClick={() => viewCondoFiles(unit)}/>,
+                view_parking: <ActionButton text={`View Parking (${unit.parking_spots.length})`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                view_lockers: <ActionButton text={`View Lockers (${unit.lockers ? unit.lockers.length : 0})`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
+                view_files: <ActionButton text={'View Files'} onClick={() => viewCondoFiles(unit)}/>,
                 registration_key: unit.registration_key,
             }
         })
         }
+        // sort by property name in ascending order then by unit's id in descending order
+        filteredData.sort((a, b) => a.property_name.localeCompare(b.property_name) || b.id - a.id);
         setFilteredCondoData(filteredData);
     }, [condoData]);
 
@@ -259,7 +255,7 @@ function Page() {
                     <DashboardPanel
                         title={`Register New Condo`}
                         buttonTitle={`Submit`}
-                        children={<CondoUnitInfo unit={newCondoProfile} setUnit={setNewCondoProfile}/>}
+                        children={<CondoUnitInfo unit={newCondoProfile} setUnit={setNewCondoProfile} properties={propertyList}/>}
                         onClick={submitNewUnit}/>
                 }
                 {(userType == UserType.RENTER || userType == UserType.OWNER) &&

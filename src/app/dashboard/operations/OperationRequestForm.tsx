@@ -38,7 +38,6 @@ function OperationRequestForm(props: RequestFormProps) {
                 disabled
                 className={"border border-gray-300 rounded-md p-2"}
             />
-
             <label htmlFor={"date_submitted"}>Date Submitted</label>
             <input
                 type={"number"}
@@ -48,7 +47,6 @@ function OperationRequestForm(props: RequestFormProps) {
                 disabled
                 className={"border border-gray-300 rounded-md p-2"}
             />
-
             <label htmlFor={"description"}>Description</label>
             <textarea
                 className={"border border-gray-300 rounded-md p-2 text-gray-400"}
@@ -57,8 +55,7 @@ function OperationRequestForm(props: RequestFormProps) {
                 disabled
                 onChange={(e) => setRequest({...request, description: e.target.value})}
             />
-
-            <label htmlFor={"amount"}>Amount</label>
+            <label htmlFor={"amount"}>Cost ($)</label>
             <input
                 type={"number"}
                 id={"amount"}
@@ -67,8 +64,6 @@ function OperationRequestForm(props: RequestFormProps) {
                 placeholder={request.amount?.toString()}
                 className={"border border-gray-300 rounded-md p-2"}
             />
-
-
             <label htmlFor={"assigned_to"}>Assign To</label>
             <select
                 id={"type"}
@@ -76,7 +71,7 @@ function OperationRequestForm(props: RequestFormProps) {
                 onChange={(e) => setRequest({...request, assigned_to: e.target.value})}
                 className={"border border-gray-300 rounded-md p-2"}
             >
-                <option value={""} disabled>Select Employee</option>
+            <option value={""} disabled>Select Employee</option>
                 {employees.map((employee) => (
                     <option key={employee.id} value={employee.id}>{employee.name}</option>
                 ))}

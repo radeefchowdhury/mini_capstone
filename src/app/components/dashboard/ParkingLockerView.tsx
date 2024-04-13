@@ -5,7 +5,9 @@ import {
     allocateParkingLockerById,
     createParkingLocker,
     deleteParkingLocker,
-    freeParkingLockerById, getHighestParkingLockerId, updateParkingLockerFee
+    freeParkingLockerById,
+    getHighestParkingLockerId,
+    updateParkingLockerFee
 } from "@/app/api/property/ParkingLockerAPI";
 
 interface ParkingLockerViewProps {
@@ -153,17 +155,17 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
     const updateFilteredItems = (list: any[]) => {
         // concat list and itemsToAdd
         list = list.concat(Object.keys(itemsToAdd).map((id) => {
-            return {id: parseInt(id), fee: itemsToAdd[parseInt(id)]}
+            return {id: parseInt(id), fee: itemsToAdd[parseInt(id)], type: 'NEW'}
         }))
         let filteredData = list.map((item) => {
             return {
                 id: item.id,
                 id_col: view == 'COMPANY' ?
-                    <div className={"flex flex-row justify-between px-2"}>
+                    <div className={`flex flex-row justify-between px-2`}>
                         <input type="checkbox"
                                onChange={() => toggleItemToDelete(item.id)}
                                checked={selectedItems.includes(item.id)}
-                               disabled={isItemOccupiedByUnit(item.id)}
+                               disabled={isItemOccupiedByUnit(item.id) || item.type == 'NEW'}
                         />
                         <div>{item.id}</div>
                         <input
@@ -174,7 +176,7 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
                 fee: item.fee,
                 fee_col: from == "PROPERTY" ?
                     <input
-                        className="p-2 m-1 max-w-36 appearance-none border border-slate-300 focus:outline-slate-500 rounded-md text-center"
+                        className="px-2 py-1 my-1 mx-2 max-w-28 min-w-28 appearance-none border border-slate-300 focus:outline-slate-500 rounded-md text-center"
                         key={`fee-${item.id}`}
                         defaultValue={itemsToEdit[item.id] || item.fee}
                         onBlur={(e) => {
@@ -182,7 +184,7 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
                             setItemsToEdit(currentFees => ({ ...currentFees, [item.id]: newFee }));
                         }}
                         type="number" id="fee">
-                    </input> : item.fee,
+                    </input> : item.fee.toString(),
                 status: item.unit_id ? 'Occupied' : 'Available'
             }
         })

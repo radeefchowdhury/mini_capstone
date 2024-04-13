@@ -3,7 +3,7 @@ import PopupPanel from "@/app/components/dashboard/PopupPanel";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import {getCondoFilesFromCondoId} from "@/app/api/property/CondoFileAPI";
 import ActionIcon from "@/app/components/dashboard/ActionIcon";
-import {ArrowUpRightIcon, PencilSquareIcon} from "@heroicons/react/24/outline";
+import {ArrowUpRightIcon} from "@heroicons/react/24/outline";
 import {CondoFileType, CondoUnitType} from "@/app/constants/types";
 
 interface UnitsFilesViewProps {
@@ -64,14 +64,23 @@ function UnitsFilesView(props: UnitsFilesViewProps) {
                 <PopupPanel
                     title={"Condo Files: " + condo.name}
                     visible={isVisible}
-                    children={<DashboardTable
-                        headers={[
-                            {name: 'File Name', key: 'name'},
-                            {name: 'File Type', key: 'type'},
-                            {name: 'Condo Name', key: 'condo_name'},
-                            {name: 'Actions', key: 'view'},
-                        ]}
-                        items={filteredFiles}/>}
+                    children={
+                    <div>
+                        <DashboardTable
+                            headers={[
+                                {name: 'File Name', key: 'name'},
+                                {name: 'File Type', key: 'type'},
+                                {name: 'Condo Name', key: 'condo_name'},
+                                {name: 'Actions', key: 'view'},
+                            ]}
+                            items={filteredFiles}/>
+                        {files.length === 0 &&
+                            <div className={"text-center text-gray-500 mt-4"}>
+                                No files found
+                            </div>
+                        }
+                    </div>
+                    }
                     setVisible={setIsVisible}
                 />)
             }
