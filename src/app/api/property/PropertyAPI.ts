@@ -84,7 +84,6 @@ export const registerCondoUnitWithKey = async (user_id: any, key: any) => {
         .update({
             occupied_by: user_id,
             occupied_since: new Date().toISOString(),
-            amount_due: 0
         })
         .eq('registration_key', key)
         .then(res => {

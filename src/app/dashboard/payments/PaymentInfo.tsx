@@ -15,7 +15,6 @@ interface PaymentInfoProps {
     userId: string;
     setPayment: (payment: any) => void;
     condos: CondoUnitType[];
-    requests: RequestType[];
     cardInfo: CardInfoType;
     setCardInfo: (cardInfo: CardInfoType) => void;
     error?: string;
@@ -26,7 +25,6 @@ function PaymentInfo(props: PaymentInfoProps) {
         payment,
         setPayment,
         condos,
-        requests,
         userId,
         cardInfo,
         setCardInfo
@@ -99,54 +97,6 @@ function PaymentInfo(props: PaymentInfoProps) {
 
     return (
         <div className={"-mb-3 text-slate-500 font-medium flex flex-col gap-3"}>
-            <div className="flex flex-col gap-1">
-                <label htmlFor="Type" className="">Type</label>
-                <div className="flex flex-row gap-3">
-                    <div>
-                        <input
-                            className={"mr-1"}
-                            type="radio"
-                            id="condo"
-                            name="type"
-                            value="CONDO"
-                            checked={payment.type === 'CONDO'}
-                            onChange={(e) => setPayment({...payment, type: e.target.value})}
-                        />
-                        <label htmlFor="condo">Condo</label>
-                    </div>
-                    <div>
-                        <input
-                            className={"mr-1"}
-                            type="radio"
-                            id="request"
-                            name="type"
-                            value="REQUEST"
-                            checked={payment.type === 'REQUEST'}
-                            onChange={(e) => setPayment({...payment, type: e.target.value})}
-                        />
-                        <label htmlFor="request">Request</label>
-                    </div>
-                </div>
-            </div>
-            {payment.type === "REQUEST" &&
-                <div className="flex flex-col gap-1 font-inter bg-white">
-                    <label htmlFor="Requests" className="">Requests</label>
-                    <select
-                        value={payment.request_id || ""}
-                        onChange={(e) => setPayment({...payment, request_id: e.target.value})}
-                        id="request_id"
-                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md font-inter bg-white">
-                        <option className={"text-slate-600"} value={""} disabled>Select Request</option>
-                        {requests.map((request) => {
-                            if(request.status !== RequestStatus.PAYMENT_DUE) return
-                            return <option
-                                className={"text-slate-600"}
-                                key={request.id}
-                                value={request.id}>{request.condo?.name}: {request.type} (id: {request.id})
-                            </option>}
-                        )}
-                    </select>
-                </div>}
             {payment.type === "CONDO" &&
                 <div className="flex flex-col gap-1 font-inter bg-white">
                     <label htmlFor="Condo" className="">Condo</label>
@@ -177,8 +127,8 @@ function PaymentInfo(props: PaymentInfoProps) {
                     type="text" id="amount"
                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
             </div>
-            <hr className="-mx-2 my-2 border-slate-300"/>
-            <span className={"text-lg text-slate-600 font-medium"}>Card Information</span>
+            <hr className="-mx-2 mb-2 mt-3 border-slate-300"/>
+            <span className={"text-lg text-slate-600 font-bold"}>Card Information</span>
             <CardInfoForm cardInfo={cardInfo} setCardInfo={setCardInfo} from={"PAYMENT"}/>
             {props.error && <div className={"text-red-500"}>{props.error}</div>}
         </div>
