@@ -18,8 +18,8 @@ import {useSearchParams} from "next/navigation";
 const paymentsTableHeaders = [
     {name: 'ID', key: 'id'},
     {name: 'Date', key: 'date'},
+    {name: 'Condo Name', key: 'name'},
     {name: 'Amount', key: 'amount'},
-    {name: 'Type', key: 'type'},
     {name: 'Card Number', key: 'card_number'},
 ]
 function Page() {
@@ -39,7 +39,8 @@ function Page() {
     const param_type = searchParams.get('type') || '';
 
     const makeNewPaymentButton = () => {
-        setShowForm(true);
+        // Toggle form visibility
+        setShowForm(!showForm);
         setNewPayment({type: 'CONDO'} as PaymentType);
     }
 
@@ -48,10 +49,6 @@ function Page() {
         if(!newPayment) return false
         if(newPayment.type === 'CONDO' && !newPayment.unit_id){
             setError('Please select a condo');
-            return false;
-        }
-        if(newPayment.type === 'REQUEST' && !newPayment.request_id){
-            setError('Please select a request');
             return false;
         }
         if(!newPayment.amount){
@@ -81,25 +78,10 @@ function Page() {
             paid_by: userId,
             last_four: cardInfo.number.slice(-4),
         }
-        await submitNewPayment(paymentToSubmit).catch(console.error)
-            .then(() => checkToUpdateRequestStatus(paymentToSubmit as PaymentType))
-    }
-
-    const checkToUpdateRequestStatus = async (payment: PaymentType) => {
-        if(!payment.request_id) window.location.href = '/dashboard/payments'
-        const {data: requestData, error: requestError} = await getRequestByID(payment.request_id)
-        if(requestError || !requestData){
-            console.error(requestError);
-            return;
-        }
-        const {data} = getRequestPaymentData(requestData[0]);
-        if(error || !data) return;
-        console.log(data)
-        if(data.status == PaymentStatus.PAID){
-            updateRequestStatus(payment.request_id, 'COMPLETED').then(() => {
-                window.location.href = '/dashboard/payments'
+        await submitNewPayment(paymentToSubmit)
+            .then(() => {
+                 window.location.href = '/dashboard/payments';
             }).catch(console.error)
-        } else window.location.href = '/dashboard/payments'
     }
 
     const fetchPayments = async () => {
@@ -137,15 +119,14 @@ function Page() {
             return {
                 id: payment.id,
                 date: formattedDate,
+                name: payment.unit?.name,
                 amount: "$"+amount,
                 card_number: '**** **** **** ' + payment.last_four,
                 type: payment.type,
             }
         });
-        // sort by date
-        filteredPayments.sort((a, b) => {
-            return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
+        // sort by id
+        filteredPayments.sort((a, b) => b.id - a.id);
         setFilteredPayments(filteredPayments || []);
     }, [payments]);
 
@@ -166,10 +147,15 @@ function Page() {
                     title={'My Payments'}
                     buttonTitle={'Make New Payment'}
                     onClick={makeNewPaymentButton}
-                    children={<DashboardTable items={filteredPayments} headers={paymentsTableHeaders}/>}
+                    children={
+                    <div className={""}>
+                        <div className={"h-4 "}></div>
+                        <DashboardTable items={filteredPayments} headers={paymentsTableHeaders}/>
+                    </div>
+                    }
                 />
             </div>
-            <div className={"min-w-[370px]"}>
+            <div className={`min-w-0 ${showForm ? 'max-w-full' : 'max-w-fit'}`} >
                 {(showForm && userId) && <DashboardPanel
                     title={'Make New Payment'}
                     children={<PaymentInfo
@@ -177,7 +163,6 @@ function Page() {
                         setPayment={setNewPayment}
                         userId={userId}
                         condos={condoList}
-                        requests={requestList}
                         cardInfo={cardInfo}
                         setCardInfo={setCardInfo}
                         error={error}

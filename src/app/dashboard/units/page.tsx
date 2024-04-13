@@ -42,8 +42,8 @@ const condoTableHeadersForCompany = [
     {name: 'Parking Spots', key: 'view_parking'},
     {name: 'Lockers', key: 'view_lockers'},
     {name: 'View Files', key: 'view_files'},
-    {name: 'Registration Key', key: 'registration_key'},
     {name: 'Occupied By', key: 'occupant'},
+    {name: 'Registration Key', key: 'registration_key'},
     {name: 'Actions', key: 'actions'},
 ]
 
@@ -169,26 +169,22 @@ function Page() {
                     description: unit.description,
                     fee: unit.fee,
                     size: unit.size,
-                    view_parking: <ActionButton title={`View Parking`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
-                    view_lockers: <ActionButton title={`View Lockers`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
-                    view_files: <ActionButton title={`View Files (${unit.files ? unit.files.length : 0})`} onClick={() => viewCondoFiles(unit)}/>,
+                    view_parking: <ActionButton text={`View Parking`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                    view_lockers: <ActionButton text={`View Lockers`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
+                    view_files: <ActionButton text={`View Files (${unit.files ? unit.files.length : 0})`} onClick={() => viewCondoFiles(unit)}/>,
                     registration_key:
-                        <button
-                            className={`${unit.registration_key ? 
-                                "flex items-center justify-center py-1 px-3 mx-auto bg-blue-500 hover:bg-blue-700 text-white text-sm rounded-md" : 
-                                "flex items-center justify-center py-1 px-3 mx-auto bg-gray-300 text-gray-500 text-sm rounded-md cursor-default"}`}
+                        <ActionButton
+                            text={unit.registration_key ? "Copy Key" : "No Key"}
+                            tooltip={unit.registration_key || "Generate a key first"}
                             onClick={() => navigator.clipboard.writeText(unit.registration_key as string)}
-                            disabled={!unit.registration_key}
-                            title={unit.registration_key}>
-                            {unit.registration_key ? "Copy Key" : "No Key"}
-                        </button>,
+                            disabled={!unit.registration_key}/>,
                     occupant: unit.occupant ?
                         <div>{unit.occupant.first_name + " " + unit.occupant.last_name}</div> :
-                        <div className={"text-stone-700 bg-gray-100 p-1 rounded-md"}>Unoccupied</div>,
+                        <div className={"text-gray-600 bg-gray-200 p-1 rounded-md"}>Unoccupied</div>,
                     actions: (
                         <div className={"flex flex-row gap-4 py-2 px-3"}>
-                            <ActionButton title={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
                             <ActionIcon Icon={PencilSquareIcon} onClick={() => selectCondoUnit(unit)}/>
+                            <ActionButton text={'Generate Key'} onClick={() => generateRegistrationKey(unit.id)}/>
                         </div>
                     )
                 }
@@ -204,9 +200,9 @@ function Page() {
                 description: unit.description,
                 fee: unit.fee,
                 size: unit.size,
-                view_parking: <ActionButton title={`View Parking (${unit.parking_spots.length})`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
-                view_lockers: <ActionButton title={`View Lockers (${unit.lockers ? unit.lockers.length : 0})`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
-                view_files: <ActionButton title={'View Files'} onClick={() => viewCondoFiles(unit)}/>,
+                view_parking: <ActionButton text={`View Parking (${unit.parking_spots.length})`} onClick={() => viewParkingLockerOnClick(unit, 'PARKING')}/>,
+                view_lockers: <ActionButton text={`View Lockers (${unit.lockers ? unit.lockers.length : 0})`} onClick={() => viewParkingLockerOnClick(unit, 'LOCKER')}/>,
+                view_files: <ActionButton text={'View Files'} onClick={() => viewCondoFiles(unit)}/>,
                 registration_key: unit.registration_key,
             }
         })
