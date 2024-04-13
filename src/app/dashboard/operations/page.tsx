@@ -162,7 +162,7 @@ function Page(){
                             icon={ArrowDownCircleIcon}
                              icon_color={"bg-blue-500"}
                              title={"Operational Budget"}
-                             value={`$${widgetData.budget?.toFixed(2) || '0'}`}
+                             value={`$${(widgetData.budget - widgetData.paid_amount)?.toFixed(2) || '0'}`}
                         />
                         <DashboardWidget
                             icon={ArrowUpCircleIcon}

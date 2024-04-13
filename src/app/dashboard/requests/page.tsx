@@ -64,6 +64,7 @@ function Page(){
             }
 
             return{
+                id: request.id,
                 condo_name: request.condo?.name,
                 request_type: request.type,
                 date_submitted: request.date,
@@ -75,7 +76,9 @@ function Page(){
                 </div>,
 
             }
-        }); 
+        });
+        // sort by id
+        filteredData.sort((a, b) => b.id - a.id);
         setFilteredRequestData(filteredData);
     }, [requestData]);
 
