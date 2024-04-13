@@ -86,7 +86,7 @@ export const getRequestPaymentData = (request: RequestType) => {
     }};
 }
 
-export const getOperationalBudget = async (company_id: any) => {
+export const getOperationWidgetData = async (company_id: any) => {
     // get all payments of type 'CONDO' for which unit_id is owned by the company
     const {data: paymentData, error: paymentError} = await supabase
         .from('Payment')
@@ -95,31 +95,39 @@ export const getOperationalBudget = async (company_id: any) => {
     if (paymentError) {
         console.error(paymentError);
         return {data: null, error: paymentError};
-    } else {
-        const totalAmount = paymentData.reduce((sum, record) => {
-            if(!record.unit) return sum;
-            return sum + parseFloat(record.amount);
-        }, 0);
-        return {data: totalAmount, error: null};
+    } 
+    const budget = paymentData.reduce((sum, record) => {
+        if(!record.unit) return sum;
+        return sum + parseFloat(record.amount);
+    }, 0);
+    // get all requests for which the unit is owned by the company
+    const {data: requestData, error: requestError} = await supabase
+        .from('Request')
+        .select('amount, status, unit:CondoUnit(property:Property(*, company_id))')
+        .eq('unit.property.company_id', company_id)
+    if (requestError) {
+        console.error(requestError);
+        return {data: null, error: requestError};
     }
-}
+    // Calculate the total amount of all requests that are not completed
+    const costs = requestData.reduce((sum: number, record: any) => {
+        if (record.status !== 'COMPLETED' && record.amount) return sum + Number(record.amount);
+        return sum;
+    }, 0);
 
-export const getOperationalExpenses = async (company_id: any) => {
-    // get all payments of type 'REQUEST' for which unit_id is owned by the company
-    const {data: paymentData, error: paymentError} = await supabase
-        .from('Payment')
-        .select('amount, request:Request(unit:CondoUnit(property:Property(*, company_id)))')
-        .eq('request.unit.property.company_id', company_id);
-    if (paymentError) {
-        console.error(paymentError);
-        return {data: null, error: paymentError};
-    } else {
-        const totalAmount = paymentData.reduce((sum, record) => {
-            if(!record.request) return sum;
-            return sum + parseFloat(record.amount);
-        }, 0);
-        return {data: totalAmount, error: null};
-    }
+    // Calculate the total amount of all requests that are completed
+    const paid_amount = requestData.reduce((sum: number, record: any) => {
+        if (record.status === 'COMPLETED' && record.amount) return sum + Number(record.amount);
+        return sum;
+    }, 0);
+
+    console.log(budget, costs, paid_amount)
+
+    return {data: {
+        budget,
+        costs,
+        paid_amount
+    }, error: null};
 }
 
 export const getTotalAmountDue = async (user_id: string, type: UserType) => {
