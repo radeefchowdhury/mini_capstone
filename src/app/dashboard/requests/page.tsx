@@ -6,18 +6,14 @@ import {getRequestsFromOccupant, submitRequest} from "@/app/api/request/RequestA
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
 import RequestForm from "./RequestForm";
 import {getCondoIDFromName, getCondosFromOccupant} from "@/app/api/property/PropertyAPI";
-import ActionButton from "@/app/components/dashboard/ActionButton";
-import {getRequestPaymentData} from "@/app/api/finance/FinanceAPI";
 
 
 const requestTableHeaders = [
     {name: 'Condo Name', key: 'condo_name'},
     {name: 'Request Type', key: 'request_type'},
     {name: 'Date Submitted', key: 'date_submitted'},
-    {name: 'Amount ($)', key: 'amount'},
-    {name: 'Amount Due ($)', key: 'amount_due'},
+    {name: 'Cost ($)', key: 'amount'},
     {name: 'Status', key: 'status'},
-    {name: 'Actions', key: 'actions'},
 ]
 
 
@@ -36,11 +32,6 @@ function Page(){
     useEffect(() => {
         setUserId(localStorage.getItem('user_id') as string);
     }, []);
-
-    const makePayment = (request: RequestType) => {
-        const url = `/dashboard/payments?id=${request.id}&type=REQUEST`;
-        window.location.href = url
-    }
 
     const fetchRequestData = async () => {
         const {data: requestData, error:requestError} = await getRequestsFromOccupant(userId);
@@ -63,14 +54,12 @@ function Page(){
         let filteredData;
         filteredData = requestData.map((request) => {
             const formattedAmount = request.amount ? `${request.amount.toFixed(2)}` : 'Unset';
-            const requestPaymentData = getRequestPaymentData(request);
             const requestStatusColor = {
                 'PENDING': 'bg-yellow-100 text-yellow-700',
                 'COMPLETED': 'bg-green-100 text-green-700',
                 'APPROVED': 'bg-teal-100 text-teal-700',
                 'REJECTED': 'bg-red-100 text-red-700',
                 'IN PROGRESS': 'bg-amber-100 text-amber-700',
-                'PAYMENT DUE': 'bg-lime-100 text-lime-700',
                 'DENIED': 'bg-red-100 text-red-700'
             }
 
@@ -79,19 +68,11 @@ function Page(){
                 request_type: request.type,
                 date_submitted: request.date,
                 amount: formattedAmount,
-                amount_due: requestPaymentData.data.amount_due.toFixed(2).toString(),
                 status: <div className={`mx-auto rounded-md py-[2px] w-[120px] px-3 ${requestStatusColor[request.status as unknown as
                     keyof typeof requestStatusColor
                     ]}`}>
                     {request.status.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}
                 </div>,
-                actions:
-                    request.status === RequestStatus.PAYMENT_DUE ?
-                        <ActionButton title={'Make Payment'} onClick={() => makePayment(request)}/> :
-                        <button disabled={true}
-                                className={"flex cursor-not-allowed items-center justify-center py-1 px-3 mx-auto text-stone-600 bg-gray-200 text-sm rounded-md"}>
-                            Make Payment
-                        </button>
 
             }
         }); 

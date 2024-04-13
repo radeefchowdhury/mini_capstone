@@ -12,16 +12,11 @@ import {
     ArrowUpCircleIcon,
     ArrowUpRightIcon,
     CheckCircleIcon,
-    EllipsisHorizontalCircleIcon, ExclamationCircleIcon, ExclamationTriangleIcon
+    EllipsisHorizontalCircleIcon,
+    ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
 import FinancePaymentsView from "@/app/dashboard/finances/FinancePaymentsView";
-import {
-    getCondoPaymentData,
-    getFinanceWidgetData,
-    getTotalAmountDue,
-    getTotalAmountPaid,
-    updateCondoFee
-} from "@/app/api/finance/FinanceAPI";
+import {getCondoPaymentData, getFinanceWidgetData, PaymentStatus, updateCondoFee} from "@/app/api/finance/FinanceAPI";
 import DashboardWidget from "@/app/components/dashboard/DashboardWidget";
 
 const financialHeaders = [
@@ -36,7 +31,7 @@ const financialHeaders = [
     {name: 'Actions', key: 'actions'},
 ]
 
-interface WidgetDataType {
+interface financeWidgetDataType {
     totalAmountDue: number;
     totalAmountPaid: number;
     totalUnits: number;
@@ -53,7 +48,7 @@ function Page() {
     const [filteredUnits, setFilteredUnits] = React.useState<any[]>([]);
     const [showUnitForm, setShowUnitForm] = React.useState<boolean>(false);
     const [showPaymentsView, setShowPaymentsView] = React.useState<boolean>(false);
-    const [widgetData, setWidgetData] = React.useState<WidgetDataType>({} as WidgetDataType);
+    const [widgetData, setWidgetData] = React.useState<financeWidgetDataType>({} as financeWidgetDataType);
 
     const generateAnnualReport = async () => {
         // Generate annual report
@@ -140,8 +135,9 @@ function Page() {
                     </div>,
                 actions:
                     <div className={"flex flex-row gap-3"}>
-                        {(userType === UserType.RENTER || userType === UserType.OWNER)  && <ActionButton title={'Make Payment'} onClick={() => makePayment(unit, data.amount_due)}/>}
-                        <ActionButton title={'View Payments'} onClick={() => viewPayments(unit)}/>
+                        {(userType === UserType.RENTER || userType === UserType.OWNER)  &&
+                        <ActionButton text={'Make Payment'} onClick={() => makePayment(unit, data.amount_due)} disabled={data.status === PaymentStatus.PAID}/>}
+                        <ActionButton text={'View Payments'} onClick={() => viewPayments(unit)}/>
                         <ActionIcon onClick={() => editUnit(unit)} Icon={ArrowUpRightIcon}/>
                     </div>,
             }
@@ -168,12 +164,16 @@ function Page() {
             <div className={"min-w-0 max-w-fit"}>
                 <div className={"flex flex-col gap-4"}>
                     <div className={"flex flex-row gap-4"}>
-                        <DashboardWidget icon={ArrowUpCircleIcon} icon_color={"bg-blue-600"} title={"Total Amount Paid"} value={`$${widgetData.totalAmountPaid?.toFixed(2) || '0'}`}/>
-                        <DashboardWidget icon={ArrowDownCircleIcon} icon_color={"bg-orange-600"} title={"Total Amount Due"} value={`$${widgetData.totalAmountDue?.toFixed(2) || '0'}`}/>
-                        <DashboardWidget icon={CheckCircleIcon} icon_color={"bg-green-600"} title={"Paid Units"} value={`${widgetData.paidUnits || '0'}`}/>
-                        <DashboardWidget icon={EllipsisHorizontalCircleIcon} icon_color={"bg-green-600"} title={"Incomplete Units"} value={`${widgetData.incompleteUnits || '0'}`}/>
-                        <DashboardWidget icon={ExclamationTriangleIcon} icon_color={"bg-red-600"} title={"Unpaid Units"} value={`${widgetData.unpaidUnits || '0'}`}/>
-
+                        <DashboardWidget icon={ArrowUpCircleIcon} icon_color={"bg-blue-600"} title={"Total Amount Paid"}
+                                            value={`$${widgetData.totalAmountPaid?.toFixed(2) || '0'}`}/>
+                        <DashboardWidget icon={ArrowDownCircleIcon} icon_color={"bg-orange-600"} title={"Total Amount Due"}
+                                            value={`$${widgetData.totalAmountDue?.toFixed(2) || '0'}`}/>
+                        <DashboardWidget icon={CheckCircleIcon} icon_color={"bg-green-600"} title={"Paid Units"}
+                                            value={`${widgetData.paidUnits || '0'}` + (widgetData.paidUnits === 1 ? ' unit' : ' units')}/>
+                        <DashboardWidget icon={EllipsisHorizontalCircleIcon} icon_color={"bg-amber-500"} title={"Incomplete Units"}
+                                            value={`${widgetData.incompleteUnits || '0'}` + (widgetData.incompleteUnits === 1 ? ' unit' : ' units')}/>
+                        <DashboardWidget icon={ExclamationTriangleIcon} icon_color={"bg-red-600"} title={"Unpaid Units"}
+                                            value={`${widgetData.unpaidUnits || '0'}` + (widgetData.unpaidUnits === 1 ? ' unit' : ' units')}/>
                     </div>
                     <DashboardPanel
                         title={'Units Finances'}

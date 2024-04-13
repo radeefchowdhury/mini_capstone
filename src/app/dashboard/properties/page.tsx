@@ -93,9 +93,9 @@ function Page() {
                 name: property.name,
                 address: property.address,
                 unit_count:  <span>{property.units?.length || 0}</span>,
-                parking_count: <ActionButton title={"View Parking (" + property.parking_spots?.length +")"} onClick={() => viewParkingLockerOnClick(property, 'PARKING')}/>,
-                locker_count: <ActionButton title={"View Lockers (" + property.lockers?.length +")"} onClick={() => viewParkingLockerOnClick(property, 'LOCKER')}/>,
-                condo_files: <ActionButton title={"View Files (" + fileCount + ")"} onClick={() => viewPropertyFiles(property)}/>,
+                parking_count: <ActionButton text={"View Parking (" + property.parking_spots?.length +")"} onClick={() => viewParkingLockerOnClick(property, 'PARKING')}/>,
+                locker_count: <ActionButton text={"View Lockers (" + property.lockers?.length +")"} onClick={() => viewParkingLockerOnClick(property, 'LOCKER')}/>,
+                condo_files: <ActionButton text={"View Files (" + fileCount + ")"} onClick={() => viewPropertyFiles(property)}/>,
                 edit: <ActionIcon Icon={PencilSquareIcon} onClick={() => selectProperty(property)}/>
             }
         })
