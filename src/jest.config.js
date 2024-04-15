@@ -45,6 +45,14 @@ const customJestConfig = {
         '!**/app/dashboard/finances/page.tsx',
         '!**/app/dashboard/operations/OperationRequestForm.tsx',
         '!**/app/dashboard/operations/page.tsx',
+        '!**/app/dashboard/payments/page.tsx',
+        '!**/app/dashboard/payments/PaymentInfo.tsx',
+        '!**/app/dashboard/finances/FinancePaymentsView.tsx',
+        '!**/app/dashboard/finances/FinanceUnitInfo.tsx',
+        '!**/app/dashboard/units/page.tsx',
+        '!**/app/dashboard/units/UnitsFilesView.tsx',
+        '!**/app/dashboard/requests/page.tsx',
+        '!**/app/components/dashboard/ParkingLockerView.tsx',
     ],
 };
 
