@@ -59,7 +59,7 @@ function Page(){
         delete updatedRequest.employee
         await submitRequest(updatedRequest).then(res => {
             console.log(res)
-            window.location.reload();
+            // window.location.reload();
         })
     }
 
@@ -136,7 +136,9 @@ function Page(){
                         ]}`}>
                     {operationRequest.status.toLowerCase().split(' ').map((s) => s.charAt(0).toUpperCase() + s.substring(1)).join(' ')}
                 </div>,
-                assigned_to: operationRequest.assigned_to ? (operationRequest.employee?.name) : 'Unassigned',
+                assigned_to: operationRequest.assigned_to ? (operationRequest.employee?.profile?.first_name + " " +
+                    operationRequest.employee?.profile?.last_name
+                ) : 'Unassigned',
                 actions:
                     <div className={"flex flex-row gap-3 px-2"}>
                         <ActionIcon Icon={PencilSquareIcon} onClick={() => onEdit(operationRequest)}/>
