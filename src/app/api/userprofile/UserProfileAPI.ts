@@ -17,6 +17,15 @@ export const submitUserProfile = async (userProfile:UserProfileType) => {
         })
 }
 
+export const submitUserProfileNoReload = async (userProfile:UserProfileType) => {
+    await supabase
+        .from('UserProfile')
+        .upsert([userProfile])
+        .then(res => {
+            console.log(res)
+        })
+}
+
 export const getUserProfileById = async (id: string)  => {
     const {data, error} = await supabase
         .from('UserProfile')
@@ -36,7 +45,7 @@ export const uploadProfilePicture = async (profilePictureFile: File, fileName: s
         .catch(console.error)
 }
 
-export const getProfilePictureURL = async (fileName: string)  => {
+export const getProfilePictureURL = async (fileName: string)=> {
     const {data} =  supabase
         .storage
         .from('profile_picture_bucket')
