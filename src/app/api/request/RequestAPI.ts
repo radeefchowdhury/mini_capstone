@@ -12,6 +12,7 @@ export const getRequestsFromOccupant = async (id: any) => {
 }
 
 export const submitRequest = async (request: any) => {
+
     await supabase
         .from('Request')
         .upsert([request])
@@ -31,9 +32,19 @@ export const getRequestDataFromCondoName = async (name: any) => {
 export const getEmployeesFromCompany = async (id: any) => {
     const {data, error} = await supabase
         .from('Employee')
-        .select('*')
+        .select('*, profile:UserProfile(*)')
         .eq('company_id', id)
     return {data, error}
+}
+
+export const getAssignedRequests = async (id: any) => {
+    const {data, error} = await supabase
+        .from('Request')
+        .select('*, employee:Employee!public_Request_assigned_to_fkey(*, profile:UserProfile(*)), condo:CondoUnit(name, number)')
+        .eq('employee.user_id', id)
+    console.log(data)
+    return {data, error}
+
 }
 
 export const assignRequest = async (request_id: any, employee_id: any) => {

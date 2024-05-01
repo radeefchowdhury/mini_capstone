@@ -24,7 +24,7 @@ export const getCondosFromProperty = async (id: any) => {
 export const submitPropertyProfile = async (propertyProfile: any) => {
     supabase
         .from('Property')
-        .insert([propertyProfile])
+        .upsert([propertyProfile])
         .then(res => {
             window.location.reload()
         })
@@ -60,7 +60,7 @@ export const submitCondoProfile = async (condoProfile: any) => {
     console.log(condoProfile)
     supabase
         .from('CondoUnit')
-        .insert([condoProfile])
+        .upsert([condoProfile])
         .then(res => {
             window.location.reload()
         })

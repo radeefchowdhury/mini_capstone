@@ -20,7 +20,7 @@ function CondoUnitInfo(props: CondoUnitInfoProps) {
                     type="text" id="name"
                     className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
             </div>
-            <div className="flex flex-col gap-1">
+            {props.properties && <div className="flex flex-col gap-1">
                 <label htmlFor="Property" className="">Property</label>
                 <select
                     value={unit.property_id || ""}
@@ -32,7 +32,14 @@ function CondoUnitInfo(props: CondoUnitInfoProps) {
                         <option key={property.id} value={property.id}>{property.name}</option>
                     ))}
                 </select>
-            </div>
+            </div>}
+            {!props.properties && <div className="flex flex-col gap-1">
+                <label htmlFor="Property" className="">Property</label>
+                <input
+                    value={unit.property.name || ""}
+                    type="text" id="property_name"
+                    className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md" readOnly/>
+            </div>}
             <div className="mt-2 flex flex-row gap-10 whitespace-nowrap items-center justify-between">
                 <label htmlFor="Condo Number" className="">Condo Number</label>
                 <input

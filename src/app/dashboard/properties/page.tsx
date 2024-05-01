@@ -75,6 +75,17 @@ function Page() {
         console.log(data)
     }
 
+    const editProperty = async () => {
+        if(!selectedProperty) return;
+        // delete columns: units, parking_spots, lockers from property
+        delete selectedProperty.units;
+        delete selectedProperty.parking_spots;
+        delete selectedProperty.lockers;
+        await submitPropertyProfile(selectedProperty).then(res => {
+            fetchPropertyData().catch(console.error)
+        })
+    }
+
     useEffect(() => {
         if(userId && userType){
             fetchPropertyData().catch(console.error);
@@ -99,6 +110,8 @@ function Page() {
                 edit: <ActionIcon Icon={PencilSquareIcon} onClick={() => selectProperty(property)}/>
             }
         })
+        // sort by id
+        filteredData.sort((a, b) => b.id - a.id);
         setFilteredPropertyData(filteredData)
     }, [propertyData]);
 
@@ -106,6 +119,10 @@ function Page() {
         setUserType(localStorage.getItem('user_role') as unknown as UserType);
         setUserId(localStorage.getItem('user_id') as string);
     }, []);
+
+    useEffect(() => {
+        console.log(selectedProperty)
+    }, [selectedProperty]);
 
     return (
         <div className={"flex flex-col xl:flex-row sm:gap-[36px] gap-[28px]"}>
@@ -145,7 +162,7 @@ function Page() {
                         title={`Edit Property`}
                         buttonTitle={`Save`}
                         children={<PropertyInfo property={selectedProperty || newPropertyProfile} setProperty={setSelectedProperty}/>}
-                        onClick={submitNewProperty}/>
+                        onClick={editProperty}/>
                 </div>
             }
         </div>

@@ -3,6 +3,7 @@ export enum UserType {
     RENTER = "RENTER",
     OWNER = "OWNER",
     COMPANY = "COMPANY",
+    EMPLOYEE = "EMPLOYEE",
     DISCONNECTED = "DISCONNECTED"
 }
 
@@ -96,14 +97,14 @@ export interface RequestType {
     description: string;
     unit_id: number;
     condo_name?: string;
-    condo?: {name: string};
+    condo?: CondoUnitType;
     type: string;
     date: string;
     amount: number;
     status: RequestStatus;
     payments?: PaymentType[];
     assigned_to: string;
-    employee?: {id: string, name: string};
+    employee?: EmployeeType;
 }
 
 export enum RequestStatus {
@@ -131,11 +132,15 @@ export interface CardInfoType {
 
 export interface EmployeeType {
     id: number,
-    name: string;
+    first_name: string;
+    last_name: string;
     role: EmployeeRole;
     email: string;
     phone_number: number;
     company_id: string;
+    password?: string;
+    request_id?: number;
+    profile?: UserProfileType;
 }
 
 export enum EmployeeRole {

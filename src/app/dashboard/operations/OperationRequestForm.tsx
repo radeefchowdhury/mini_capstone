@@ -24,8 +24,11 @@ function OperationRequestForm(props: RequestFormProps) {
             let filteredEmployees = data?.filter((employee: EmployeeType) => employee.role === requiredRole) || [];
             setEmployees(filteredEmployees);
         })
-        console.log(employees)
     }, [request, company_id]);
+
+    useEffect(() => {
+        console.log(employees)
+    }, [employees]);
 
     return (
         <div className={"flex flex-col gap-2"}>
@@ -73,10 +76,9 @@ function OperationRequestForm(props: RequestFormProps) {
             >
             <option value={""} disabled>Select Employee</option>
                 {employees.map((employee) => (
-                    <option key={employee.id} value={employee.id}>{employee.name}</option>
+                    <option key={employee.id} value={employee.id}>(ID:{employee.id}) {employee.profile?.first_name} {employee.profile?.last_name}</option>
                 ))}
             </select>
-
         </div>
     );
 }

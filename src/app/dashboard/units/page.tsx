@@ -104,6 +104,20 @@ function Page() {
         submitCondoProfile(condoToSubmit).catch(console.error)
     }
 
+    const editUnit = async () => {
+        if(!selectedCondo) return;
+        const condoToSubmit = {
+            id: selectedCondo.id,
+            name: selectedCondo.name,
+            number: selectedCondo.number,
+            description: selectedCondo.description || "",
+            fee: selectedCondo.fee,
+            size: selectedCondo.size,
+            property_id: selectedCondo.property_id,
+        }
+        await submitCondoProfile(condoToSubmit).catch(console.error)
+    }
+
     const selectCondoUnit = (unit: CondoUnitType) => {
         setFormAction('EDIT')
         setSelectedCondo(unit)
@@ -207,8 +221,8 @@ function Page() {
             }
         })
         }
-        // sort by property name in ascending order then by unit's id in descending order
-        filteredData.sort((a, b) => a.property_name.localeCompare(b.property_name) || b.id - a.id);
+        // sort by id
+        filteredData.sort((a, b) => b.id - a.id);
         setFilteredCondoData(filteredData);
     }, [condoData]);
 
@@ -249,7 +263,7 @@ function Page() {
                     title={`Edit Condo`}
                     buttonTitle={`Save`}
                     children={<CondoUnitInfo unit={selectedCondo || newCondoProfile} setUnit={setSelectedCondo}/>}
-                    onClick={submitNewUnit}/>
+                    onClick={editUnit}/>
                 }
                 {(userType == UserType.COMPANY) && formAction == "CREATE" &&
                     <DashboardPanel

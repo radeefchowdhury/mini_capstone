@@ -10,10 +10,11 @@ export default function Home() {
 
     const signout = async () => {
         try {
-            await supabase.auth.signOut();
             // Remove user_role and user_id from local storage
             localStorage.removeItem('user_role');
             localStorage.removeItem('user_id');
+
+            await supabase.auth.signOut();
             window.location.href = '/';
         } catch (error:any) {
             console.error('Error signing out:', error.message);
