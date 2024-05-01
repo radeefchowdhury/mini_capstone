@@ -131,7 +131,7 @@ export const getOperationWidgetData = async (company_id: any) => {
 }
 
 export const getTotalAmountDue = async (user_id: string, type: UserType) => {
-    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    if(type === UserType.DISCONNECTED || type === UserType.EMPLOYEE) return {data: null, error: 'User type is not valid'};
     const getCondosFunction = {
         [UserType.COMPANY]: getCondosFromCompany,
         [UserType.OWNER]: getCondosFromOccupant,
@@ -153,7 +153,7 @@ export const getTotalAmountDue = async (user_id: string, type: UserType) => {
 }
 
 export const getTotalAmountPaid = async (user_id: string, type: UserType) => {
-    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    if(type === UserType.DISCONNECTED || type === UserType.EMPLOYEE) return {data: null, error: 'User type is not valid'};
     const getCondosFunction = {
         [UserType.COMPANY]: getCondosFromCompany,
         [UserType.OWNER]: getCondosFromOccupant,
@@ -175,7 +175,7 @@ export const getTotalAmountPaid = async (user_id: string, type: UserType) => {
 
 export const getFinanceWidgetData = async (user_id: string, type: UserType) => {
     // Get total amount due, total amount paid, number of paid units, number of unpaid units, number of incomplete units
-    if(type === UserType.DISCONNECTED) return {data: null, error: 'User type is not defined'};
+    if(type === UserType.DISCONNECTED || type === UserType.EMPLOYEE) return {data: null, error: 'User type is not valid'};
     const getCondosFunction = {
         [UserType.COMPANY]: getCondosFromCompany,
         [UserType.OWNER]: getCondosFromOccupant,
