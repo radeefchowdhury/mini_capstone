@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
-import {CondoFileType, PropertyType} from "@/app/constants/types";
+import {CondoFileType, CondoUnitType, PropertyType} from "@/app/constants/types";
 import {
-    getCondoIDFromName,
+    getCondoIDFromName, getCondosFromProperty,
 } from "@/app/api/property/PropertyAPI";
 import PopupPanel from "@/app/components/dashboard/PopupPanel";
 import DashboardTable from "@/app/components/dashboard/DashboardTable";
@@ -29,6 +29,7 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
     const [newFileInfo, setNewFileInfo] = React.useState<CondoFileType>({} as CondoFileType)
     const [file, setFile] = React.useState<File|null>(null);
     const [filesToDelete, setFilesToDelete] = React.useState<number[]>([]);
+    const [condos, setCondos] = React.useState<CondoUnitType[]>([])
 
     const selectFile = (file: CondoFileType) => {
         setSelectedFile(file)
@@ -119,6 +120,8 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
             return
         }
         if(data) setFiles(data)
+        const {data: condoData, error: condoError} = await getCondosFromProperty(property.id);
+        if(condoData) setCondos(condoData)
     }
 
     useEffect(() => {
@@ -160,6 +163,27 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
         })
         setFilteredFiles(filteredData)
     }, [files]);
+
+    useEffect(() => {
+        console.log(selectedFile)
+    }, [selectedFile]);
+
+    useEffect(() => {
+        console.log(newFileInfo)
+    }, [newFileInfo]);
+
+    useEffect(() => {
+        if (condos.length > 0 && (!newFileInfo.unit || !newFileInfo.unit.name)) {
+            setNewFileInfo(prevState => ({
+                ...prevState,
+                unit: {
+                    ...prevState.unit,
+                    name: condos[0].name,
+                    id: 0
+                }
+            }));
+        }
+    }, [condos]);
 
     return (
         <>
@@ -224,13 +248,19 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
                                         className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
                                 </div>
                                 <div className="flex flex-col gap-1">
-                                    <label htmlFor="Condo name" className="">Condo Name</label>
-                                    <input
-                                        pattern={"[A-Za-z]*"}
-                                        value={newFileInfo.unit?.name || ""}
-                                        onChange={(e) => setNewFileInfo({...newFileInfo, unit: {id: 0, name: e.target.value}})}
-                                        type="text" id="type" name="type"
-                                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
+                                    <label htmlFor="Condo Name" className="">Condo Name</label>
+                                    <select
+                                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"
+                                        value={newFileInfo.unit?.name || (condos[0]?.name || "")}
+                                        onChange={(e) => setNewFileInfo({...newFileInfo, unit: {
+                                                name: e.target.value,
+                                                id: 0
+                                            }})}
+                                    >
+                                        {condos.map((condo) => (
+                                            <option key={condo.id} value={condo.name}>{condo.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                                 <div className="flex flex-col gap-1">
                                     <label htmlFor="Property Address" className="">File Upload</label>
@@ -261,41 +291,47 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
                             />
                             {selectedFile &&
                                 <div className={"text-slate-500 font-medium flex flex-col gap-3"}>
-                                <div className="flex flex-col gap-1">
-                                    <label htmlFor="File Name" className="">File Name</label>
-                                    <input
-                                        value={selectedFile.name || ""}
-                                        onChange={(e) => setSelectedFile({...selectedFile, name: e.target.value})}
-                                        type="text" id="name" name="name"
-                                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label htmlFor="File Type" className="">File Type</label>
-                                    <input
-                                        value={selectedFile.type || ""}
-                                        onChange={(e) => setSelectedFile({...selectedFile, type: e.target.value})}
-                                        type="text" id="type" name="type"
-                                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <label htmlFor="Condo name" className="">Condo Name</label>
-                                    <input
-                                        pattern={"[A-Za-z]*"}
-                                        value={selectedFile.unit?.name || ""}
-                                        onChange={(e) => setSelectedFile({...selectedFile, unit: {id: 0, name: e.target.value}})}
-                                        type="text" id="type" name="type"
-                                        className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
-                                </div>
-                                <div className="flex flex-col gap-1">
+                                    <div className="flex flex-col gap-1">
+                                        <label htmlFor="File Name" className="">File Name</label>
+                                        <input
+                                            value={selectedFile.name || ""}
+                                            onChange={(e) => setSelectedFile({...selectedFile, name: e.target.value})}
+                                            type="text" id="name" name="name"
+                                            className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label htmlFor="File Type" className="">File Type</label>
+                                        <input
+                                            value={selectedFile.type || ""}
+                                            onChange={(e) => setSelectedFile({...selectedFile, type: e.target.value})}
+                                            type="text" id="type" name="type"
+                                            className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"/>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <label htmlFor="Condo Name" className="">Condo Name</label>
+                                        <select
+                                            className="p-2 w-full border border-slate-300 focus:outline-slate-500 rounded-md"
+                                            value={selectedFile.unit?.name || ""}
+                                            onChange={(e) => setSelectedFile({...selectedFile, unit: {
+                                                    name: e.target.value,
+                                                    id: 0
+                                                }})}
+                                        >
+                                            {condos.map((condo) => (
+                                                <option key={condo.id} value={condo.name}>{condo.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-1">
                                     <label htmlFor="Property Address" className="">File Upload</label>
-                                    <input
-                                        className={`mb-3 relative m-0 block w-full min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-sm font-normal text-neutral-700 transition duration-200 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none `}
-                                        onChange={handleFileChange}
-                                        type="file" data-testid="profile-picture-upload" id={"profile_picture"}
-                                        name={"profile_picture"}
-                                    />
-                                </div>
-                            </div>}
+                                        <input
+                                            className={`mb-3 relative m-0 block w-full min-w-0 flex-auto cursor-pointer rounded border border-solid border-neutral-300 bg-clip-padding px-3 py-[0.32rem] text-sm font-normal text-neutral-700 transition duration-200 ease-in-out file:-mx-3 file:-my-[0.32rem] file:cursor-pointer file:overflow-hidden file:rounded-none file:border-0 file:border-solid file:border-inherit file:bg-neutral-100 file:px-3 file:py-[0.32rem] file:text-neutral-700 file:transition file:duration-150 file:ease-in-out file:[border-inline-end-width:1px] file:[margin-inline-end:0.75rem] hover:file:bg-neutral-200 focus:border-primary focus:text-neutral-700 focus:shadow-te-primary focus:outline-none `}
+                                            onChange={handleFileChange}
+                                            type="file" data-testid="profile-picture-upload" id={"profile_picture"}
+                                            name={"profile_picture"}
+                                        />
+                                    </div>
+                                </div>}
                         </>
                     }
                     visible={isVisible}
