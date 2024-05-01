@@ -181,7 +181,7 @@ function Page(){
                     </div>
                     <DashboardPanel
                         title={'Operation Requests'}
-                        children={<DashboardTable items={filteredRequestData} headers={operationHeaders}/>}
+                        content={<DashboardTable items={filteredRequestData} headers={operationHeaders}/>}
                     />
                 </div>
             </div>
@@ -189,7 +189,7 @@ function Page(){
                 <div className={"min-w-[370px]"}>
                 <DashboardPanel
                     title={"Edit Request"}
-                    children={<OperationRequestForm
+                    content={<OperationRequestForm
                         company_id={userId as string}
                         request={selectedRequest}
                         setRequest={setSelectedRequest}

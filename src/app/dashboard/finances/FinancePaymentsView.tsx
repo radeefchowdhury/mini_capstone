@@ -51,7 +51,7 @@ function FinancePaymentsView(props: PaymentsViewProps) {
                 title={'Payments: ' + unit.name}
                 visible={isVisible}
                 setVisible={setIsVisible}
-                children={
+                content={
                 <div className={"w-fit"}>
                     <DashboardTable
                         items={filteredPayments || []}

@@ -191,7 +191,7 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
                 <PopupPanel
                 title={'Property Files: ' + property.name || ' '}
                 buttonTitle={"Upload new File"}
-                children={
+                content={
                     <div>
                         <div>
                             <DashboardTable
@@ -224,7 +224,7 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
                 <PopupPanel
                     title={'Property Files'}
                     buttonTitle={"Upload Now"}
-                    children={
+                    content={
                         <>
                             <ArrowLeftIcon
                                 className={"mt-3 mb-6 w-6 h-6 text-slate-700 cursor-pointer"}
@@ -283,7 +283,7 @@ function PropertyFilesView(props: PropertyFilesViewProps) {
                 <PopupPanel
                     title={'Edit File'}
                     buttonTitle={"Save"}
-                    children={
+                    content={
                         <>
                             <ArrowLeftIcon
                                 className={"mt-3 mb-6 w-6 h-6 text-slate-700 cursor-pointer"}

@@ -3,14 +3,14 @@ import React from 'react';
 interface DashboardPanelProps {
     title: string;
     closable?: boolean;
-    children?: React.ReactNode;
+    content?: React.ReactNode;
     onClick?: () => void;
     buttonTitle?: string
 }
 
 function DashboardPanel(props: DashboardPanelProps) {
 
-    const {title, closable, onClick, buttonTitle, children} = props;
+    const {title, closable, onClick, buttonTitle, content} = props;
 
     return (
         <div className={`w-full h-fit bg-white shadow-sm rounded-md`}>
@@ -18,7 +18,7 @@ function DashboardPanel(props: DashboardPanelProps) {
                 {title}
             </div>
             <div className={"px-6 mt-3"}>
-                {children || <div />}
+                {content || <div />}
             </div>
 
             <div className={"bg-slate-100 rounded-b-md mt-7 px-6 py-4"}>

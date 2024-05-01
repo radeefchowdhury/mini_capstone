@@ -64,7 +64,7 @@ function UnitsFilesView(props: UnitsFilesViewProps) {
                 <PopupPanel
                     title={"Condo Files: " + condo.name}
                     visible={isVisible}
-                    children={
+                    content={
                     <div>
                         <DashboardTable
                             headers={[

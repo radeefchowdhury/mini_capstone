@@ -3,7 +3,7 @@ import {CondoUnitType} from "@/app/constants/types";
 import {XMarkIcon} from "@heroicons/react/24/outline";
 
 interface PopupPanelProps {
-    children?: React.ReactNode;
+    content?: React.ReactNode;
     title: string;
     buttonTitle?: string;
     onClick?: () => void;
@@ -12,7 +12,7 @@ interface PopupPanelProps {
 }
 function PopupPanel(props: PopupPanelProps) {
 
-    const {title, buttonTitle, onClick, children, visible, setVisible} = props;
+    const {title, buttonTitle, onClick, content, visible, setVisible} = props;
 
     return (
         <>
@@ -23,7 +23,7 @@ function PopupPanel(props: PopupPanelProps) {
                             <div>{title}</div>
                             <XMarkIcon onClick={() => setVisible(false)} className={"w-6 h-6 cursor-pointer"}/>
                         </div>
-                        <div className={"px-6 mt-3"}>{children || <div/>}</div>
+                        <div className={"px-6 mt-3"}>{content || <div/>}</div>
                         <div className={"bg-slate-100 rounded-b-md mt-7 px-6 py-4"}>
                             <button
                                 className={`${buttonTitle ? '' : 'invisible'} px-4 py-4 h-7 bg-indigo-500 rounded-lg hover:bg-indigo-600 text-md justify-center items-center gap-2.5 inline-flex`}

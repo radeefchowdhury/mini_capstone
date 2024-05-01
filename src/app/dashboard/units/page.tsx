@@ -247,13 +247,13 @@ function Page() {
                     <DashboardPanel
                     title={`${ 'My Condo Units'}`}
                     buttonTitle={'Register New Unit'}
-                    children={<DashboardTable items={filteredCondoData} headers={condoTableHeaders} />}
+                    content={<DashboardTable items={filteredCondoData} headers={condoTableHeaders} />}
                     onClick={registerNewUnit}/>}
                 {userType == UserType.COMPANY &&
                     <DashboardPanel
                         title={`${ 'My Condo Units'}`}
                         buttonTitle={'Register New Unit'}
-                        children={<DashboardTable items={filteredCondoData} headers={condoTableHeadersForCompany} />}
+                        content={<DashboardTable items={filteredCondoData} headers={condoTableHeadersForCompany} />}
                         onClick={registerNewUnit}/>}
             </div>
             {(selectedCondo || formAction) &&
@@ -262,21 +262,21 @@ function Page() {
                     <DashboardPanel
                     title={`Edit Condo`}
                     buttonTitle={`Save`}
-                    children={<CondoUnitInfo unit={selectedCondo || newCondoProfile} setUnit={setSelectedCondo}/>}
+                    content={<CondoUnitInfo unit={selectedCondo || newCondoProfile} setUnit={setSelectedCondo}/>}
                     onClick={editUnit}/>
                 }
                 {(userType == UserType.COMPANY) && formAction == "CREATE" &&
                     <DashboardPanel
                         title={`Register New Condo`}
                         buttonTitle={`Submit`}
-                        children={<CondoUnitInfo unit={newCondoProfile} setUnit={setNewCondoProfile} properties={propertyList}/>}
+                        content={<CondoUnitInfo unit={newCondoProfile} setUnit={setNewCondoProfile} properties={propertyList}/>}
                         onClick={submitNewUnit}/>
                 }
                 {(userType == UserType.RENTER || userType == UserType.OWNER) &&
                 <DashboardPanel
                     title={`Enter Registration Key`}
                     buttonTitle={`Submit Key`}
-                    children={<KeyForm registration_key={registrationKey} setKey={setRegistrationKey}/>}
+                    content={<KeyForm registration_key={registrationKey} setKey={setRegistrationKey}/>}
                     onClick={registerCondoWithKey}/>}
             </div>}
         </div>

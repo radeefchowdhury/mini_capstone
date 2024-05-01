@@ -319,7 +319,7 @@ function Page() {
                         title={'Card Information'}
                         buttonTitle={'Save'}
                         onClick={saveCardInfoChanges}
-                        children={<div>
+                        content={<div>
                             <CardInfoForm
                                 cardInfo={cardInfo}
                                 setCardInfo={setCardInfo}

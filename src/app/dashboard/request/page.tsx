@@ -87,7 +87,7 @@ function Page() {
             <div className={"min-w-0 max-w-full"}>
                 <DashboardPanel
                     title={'My Requests'}
-                    children={<DashboardTable
+                    content={<DashboardTable
                     items={filteredRequests}
                     headers={requestTableHeaders} />}
                     />

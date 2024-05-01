@@ -144,7 +144,7 @@ function Page() {
                 <DashboardPanel
                     title={'My Properties'}
                     buttonTitle={'Register New Property'}
-                    children={<DashboardTable items={filteredPropertyData} headers={propertyTableHeaders} />}
+                    content={<DashboardTable items={filteredPropertyData} headers={propertyTableHeaders} />}
                     onClick={registerNewProperty}/>
             </div>
             {(formAction == "CREATE") &&
@@ -152,7 +152,7 @@ function Page() {
                 <DashboardPanel
                     title={`Create New Property`}
                     buttonTitle={`Submit`}
-                    children={<PropertyInfo property={newPropertyProfile} setProperty={setNewPropertyProfile}/>}
+                    content={<PropertyInfo property={newPropertyProfile} setProperty={setNewPropertyProfile}/>}
                     onClick={submitNewProperty}/>
                 </div>
             }
@@ -161,7 +161,7 @@ function Page() {
                     <DashboardPanel
                         title={`Edit Property`}
                         buttonTitle={`Save`}
-                        children={<PropertyInfo property={selectedProperty || newPropertyProfile} setProperty={setSelectedProperty}/>}
+                        content={<PropertyInfo property={selectedProperty || newPropertyProfile} setProperty={setSelectedProperty}/>}
                         onClick={editProperty}/>
                 </div>
             }

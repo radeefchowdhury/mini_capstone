@@ -106,14 +106,14 @@ function Page() {
                     title={"My Employees"}
                     buttonTitle={'Register New Employee'}
                     onClick={registerNewEmployeeOnClick}
-                    children={<DashboardTable headers={employeeHeaders} items={filteredEmployees} />}
+                    content={<DashboardTable headers={employeeHeaders} items={filteredEmployees} />}
                 ></DashboardPanel>
             </div>
             <div className={"min-w-[370px]"}>
                 {(selectedEmployee && formAction) &&
                 <DashboardPanel
                     title={"Employee Details"}
-                    children={<EmployeeView
+                    content={<EmployeeView
                         employee={selectedEmployee}
                         setEmployee={setSelectedEmployee}
                         formAction={formAction}

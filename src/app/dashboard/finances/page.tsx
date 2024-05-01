@@ -179,14 +179,14 @@ function Page() {
                         title={'Units Finances'}
                         buttonTitle={userType === UserType.COMPANY ? 'Generate Annual Report' : undefined}
                         onClick={() => generateAnnualReport()}
-                        children={<DashboardTable items={filteredUnits} headers={financialHeaders}/>}
+                        content={<DashboardTable items={filteredUnits} headers={financialHeaders}/>}
                     />
                 </div>
             </div>
             <div className={`${(showUnitForm && selectedUnit) ? '' : 'hidden'} min-w-[370px]`}>
                 {(showUnitForm && selectedUnit) && <DashboardPanel
                     title={selectedUnit.name}
-                    children={<FinanceUnitInfo
+                    content={<FinanceUnitInfo
                         userType={userType as UserType}
                         unit={selectedUnit as CondoUnitType}
                         setUnit={setSelectedUnit}

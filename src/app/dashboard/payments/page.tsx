@@ -147,7 +147,7 @@ function Page() {
                     title={'My Payments'}
                     buttonTitle={'Make New Payment'}
                     onClick={makeNewPaymentButton}
-                    children={
+                    content={
                     <div className={""}>
                         <div className={"h-4 "}></div>
                         <DashboardTable items={filteredPayments} headers={paymentsTableHeaders}/>
@@ -158,7 +158,7 @@ function Page() {
             <div className={`min-w-0 ${showForm ? 'max-w-full' : 'max-w-fit'}`} >
                 {(showForm && userId) && <DashboardPanel
                     title={'Make New Payment'}
-                    children={<PaymentInfo
+                    content={<PaymentInfo
                         payment={newPayment}
                         setPayment={setNewPayment}
                         userId={userId}

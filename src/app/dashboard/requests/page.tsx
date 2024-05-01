@@ -107,7 +107,7 @@ function Page(){
             <DashboardPanel
               title={'My Requests'}
               buttonTitle={'Create New Request'}
-              children={<DashboardTable items={filteredRequestData} headers={requestTableHeaders} />}
+              content={<DashboardTable items={filteredRequestData} headers={requestTableHeaders} />}
               onClick={() => setShowRequestForm(true)}
             />
           </div>
@@ -116,7 +116,7 @@ function Page(){
                 <DashboardPanel
                   title={'New Request'}
                   buttonTitle={'Submit'}
-                  children={<RequestForm
+                  content={<RequestForm
                               condo_name={newCondoName} setCondoName={setNewCondoName}
                               type={newType} setType={setNewType}
                               description={newDescription} setDescription={setNewDescription}

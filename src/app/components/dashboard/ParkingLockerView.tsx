@@ -251,7 +251,7 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
                     title={popupTile}
                     visible={isVisible}
                     setVisible={setIsVisible}
-                    children={<TableContainer/>}
+                    content={<TableContainer/>}
                 />)
             }
             {view == 'COMPANY' && from == 'CONDO' && (
@@ -259,7 +259,7 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
                     title={popupTile}
                     visible={isVisible}
                     setVisible={setIsVisible}
-                    children={<TableEditorFromUnit/>}
+                    content={<TableEditorFromUnit/>}
                     buttonTitle={"Allocate " + (type == 'PARKING' ? 'Parking Spot' : 'Locker') + ' to Unit'}
                     onClick={saveChangesFromUnit}
                 />)
@@ -269,7 +269,7 @@ function ParkingLockerView(props: ParkingLockerViewProps) {
                     title={popupTile}
                     visible={isVisible}
                     setVisible={setIsVisible}
-                    children={<TableEditorFromProperty/>}
+                    content={<TableEditorFromProperty/>}
                     buttonTitle={"Save Changes"}
                     onClick={saveChangesFromProperty}
                 />)
