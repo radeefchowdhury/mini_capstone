@@ -4,6 +4,7 @@ import Logo from "@/app/components/logo/Logo";
 import supabase from "@/app/api/supabase/SupabaseContextProvider";
 import classNames from "classnames";
 import {UserType} from "@/app/constants/types";
+import {UserGroupIcon} from "@heroicons/react/24/outline";
 
 interface NavbarProps {
     dynamic?: boolean;
@@ -21,8 +22,10 @@ const dropdownItems: dropdownItem[] = [
     {name: "View Units", link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY]},
     {name: "View Operations", link: "/dashboard/operations", userTypes: [UserType.COMPANY]},
     {name: "View Requests", link: "/dashboard/requests", userTypes: [UserType.OWNER]},
+    {name: "View Employees", link: "/dashboard/employees", userTypes: [UserType.COMPANY] },
     {name: "View Finances", link: "/dashboard/finances", userTypes: [UserType.COMPANY, UserType.RENTER, UserType.OWNER]},
     {name: "View Payments", link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER]},
+    {name: "View Request", link: "/dashboard/request", userTypes: [UserType.EMPLOYEE]},
 ]
 
 function Header(props: NavbarProps) {

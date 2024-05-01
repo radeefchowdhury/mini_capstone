@@ -3,13 +3,14 @@
 
 import React, {useEffect, useRef, useState} from "react";
 import {
+    ArrowDownOnSquareIcon,
     BanknotesIcon,
     BuildingOffice2Icon,
     BuildingOfficeIcon,
     CurrencyDollarIcon,
     PencilSquareIcon,
     QueueListIcon,
-    Squares2X2Icon
+    Squares2X2Icon, UserGroupIcon
 } from "@heroicons/react/24/outline";
 import {UserType} from "@/app/constants/types";
 
@@ -32,8 +33,10 @@ const navItems = [
     { name: "View Units", icon: BuildingOfficeIcon, link: "/dashboard/units", userTypes: [UserType.OWNER, UserType.RENTER, UserType.COMPANY] },
     { name: "View Operations", icon: Squares2X2Icon, link: "/dashboard/operations", userTypes: [UserType.COMPANY] },
     { name: "View Requests", icon: QueueListIcon, link: "/dashboard/requests", userTypes: [UserType.OWNER] },
+    { name: "View Employees", icon: UserGroupIcon, link: "/dashboard/employees", userTypes: [UserType.COMPANY] },
     { name: "View Finances", icon: CurrencyDollarIcon, link: "/dashboard/finances", userTypes: [UserType.COMPANY, UserType.OWNER, UserType.RENTER] },
     { name: "View Payments", icon: BanknotesIcon, link: "/dashboard/payments", userTypes: [UserType.OWNER, UserType.RENTER] },
+    { name: "View Request", icon: ArrowDownOnSquareIcon, link: "/dashboard/request", userTypes: [UserType.EMPLOYEE] },
 ]
 
 export default function SideNav(props: SideNavProps) {
